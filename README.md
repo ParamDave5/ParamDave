@@ -1,4 +1,4 @@
-# Aditya_Varadaraj_Portfolio
+# Param's Portfolio
 Portfolio Website
 
 Some Useful Website Templates:
