@@ -1,0 +1,78 @@
+PORTFOLIO IMPROVEMENT BACKLOG
+=============================
+Prioritized changes to take the site from B+ to A.
+
+
+TIER 1 — DO THESE TO ACTUALLY MOVE THE NEEDLE
+---------------------------------------------
+[ ] Add a /writing or /blog page. Start with one essay (800-1500 words).
+    Suggested topics:
+      - "What most LLM evals miss"
+      - "From 3DGS paper to 30 FPS in production"
+      - "Why agentic systems still don't work reliably"
+
+[ ] Write one flagship case study. Pick IDP pipeline OR Gaussian Splatting + GLOMAP.
+    Structure: Problem -> Approaches tried -> What worked -> What broke -> Numbers -> Screenshot/diagram
+    Target: ~600 words.
+
+[ ] Replace coursework with current side projects on Projects page.
+    Move 2021-2022 academic work into a collapsed "Earlier Work" section at bottom.
+    The Senior label demands it.
+
+[ ] Add at least one image to Research page.
+    (architecture diagram, Gaussian Splatting render GIF, or LiDAR segmentation output)
+
+
+TIER 2 — QUICK WINS, LOW EFFORT
+-------------------------------
+[x] Add OG image (designed 1200x630 PNG with name, tagline, photo, amber accent)
+    Generated via SVG -> headless Chrome render. Source: public/og.svg
+[x] Trim Skills page to 6 core sections + "Also familiar with" footer
+[x] Add favicon variants (apple-touch-icon.png generated via qlmanage)
+[x] Add "Now" snippet on Home (May 2026: agent harness, eval, IDP)
+    Reminder: update this monthly so the site feels alive
+[x] Education already above Beyond Work on About page (was already correct)
+[x] Bonus: Removed redundant "Find me" section from Home (duplicated footer)
+
+
+TIER 3 — NICE TO HAVE
+---------------------
+[ ] Add a "core question" line to each Research domain
+    (what you're actually trying to figure out)
+[ ] Add publications/talks/contributions section even if empty for now
+    ("nothing public yet, working on it" is more honest than absence)
+[ ] Add <link rel="alternate"> RSS feed if you start blogging
+[ ] Set up basic analytics (Plausible or Umami, both privacy-friendly)
+[ ] Add a small "what I'm reading" widget (3-5 papers you're currently chewing on)
+    Cheap signal of taste.
+
+
+TIER 4 — CONTENT / VOICE POLISH
+-------------------------------
+[x] Drop "Senior Machine Learning Engineer · TRC Inc" from Home hero
+[x] Tighten the Home pitch from 3 sentences to 2
+[x] Remove "Find me" section from Home (duplicates the footer)
+[ ] Add date stamps to research items so visitors know what's fresh
+
+
+TIER 5 — STRUCTURAL IDEAS TO CONSIDER
+-------------------------------------
+[ ] Add a /notes or /garden section for half-formed ideas (lower bar than blog posts)
+[ ] Consider an interactive demo for one project
+    (even a static HuggingFace Space link)
+[ ] Add a "How I work" page if you want to attract specific kinds of teams
+
+
+GAPS THAT ARE HURTING THE MOST RIGHT NOW
+----------------------------------------
+1. No writing / blog -> can't demonstrate thinking quality at scale
+2. Everything is at the same depth -> no "here's how I actually think" project
+3. Zero images on Research/Projects -> all text, no proof
+4. Projects page is mostly old coursework -> wrong signal for a Senior role
+5. No public artifacts (papers, talks, OSS contributions, demos)
+
+
+HIGHEST-LEVERAGE NEXT MOVE
+--------------------------
+Tier 1 #2: Write the flagship case study (IDP or Gaussian Splatting).
+Single biggest jump in perceived seniority for the smallest amount of work.

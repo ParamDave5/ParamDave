@@ -1,0 +1,219 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const activeInvestigations = [
+  {
+    id: 'agent-reliability',
+    status: 'Active',
+    area: 'Agents & evaluation',
+    title: 'Making model behavior verifiable',
+    question:
+      'Can an evaluation reveal why an agent failed—and whether it reached the right answer for the right reason?',
+    motivation:
+      'A single aggregate score compresses away the distinction between perception, reasoning, tool-use, formatting, and verification failures. That makes the number hard to act on.',
+    currentWork: [
+      'Decomposing failed runs into specific, actionable failure modes.',
+      'Comparing automated grading, adversarial probing, and grounded verification.',
+      'Generating synthetic document questions that resemble real user intent rather than template variations.',
+    ],
+    learned:
+      'Evaluation quality is itself an empirical question. A grader or benchmark should be tested for sensitivity, failure coverage, and usefulness to the person deciding what to change next.',
+    related: 'reliable-agents',
+  },
+  {
+    id: 'grounded-reasoning',
+    status: 'Evaluating',
+    area: 'Multimodal reasoning',
+    title: 'Grounding an answer in the evidence behind it',
+    question:
+      'Can a vision-language model connect its rationale to the image regions that actually support the conclusion?',
+    motivation:
+      'A fluent diagnosis is not trustworthy merely because it sounds coherent. In high-stakes visual domains, the model should expose which evidence its answer depends on.',
+    currentWork: [
+      'Participating in a closed evaluation challenge for image-grounded reasoning in medical imagery.',
+      'Post-training Qwen3-VL-8B: first implementing a vanilla GRPO baseline, then a DAPO-based variant augmented with PaPO’s perception-aware objective.',
+      'Using corruption augmentation to improve robustness to degraded or shifted visual inputs.',
+      'Running distributed RL post-training with PyTorch DDP and TRL across a GeForce RTX 5090 and 32 GB RTX PRO 4500 Blackwell, using a custom gated reward whose veto judge combines InternVL and GLM-VL.',
+    ],
+    learned:
+      'Grounding changes both the training signal and the evaluation target: the system must be right about the answer and about the visual evidence it claims to have used.',
+  },
+];
+
+const questionQueue = [
+  {
+    area: 'Inference systems',
+    question: 'Which optimizations survive contact with real traffic?',
+    detail:
+      'Quantization, speculative decoding, batching, and serving topologies often look different under production request distributions than they do in published throughput benchmarks.',
+    lens: 'vLLM · SGLang · llama.cpp',
+  },
+  {
+    area: 'Post-training',
+    question: 'What improves reasoning rather than the appearance of reasoning?',
+    detail:
+      'I am interested in faithful intermediate steps, verifiable rewards, and training signals that generalize beyond the benchmark used to optimize them.',
+    lens: 'GRPO · DAPO · PaPO · gated rewards · LoRA / QLoRA',
+  },
+  {
+    area: 'Physical AI',
+    question: 'What changes when a model can be wrong in the physical world?',
+    detail:
+      'Robotics and 3D perception force models to deal with partial observation, action, geometry, and consequences—not only a larger context window.',
+    lens: 'SLAM · LiDAR · spatial reasoning',
+  },
+];
+---
+<Layout
+  title="Research Questions — Param Dave"
+  description="Active investigations into reliable agents, grounded reasoning, inference systems, post-training, and physical AI."
+>
+  <section class="mx-auto max-w-5xl px-6 pt-16 pb-12 sm:pt-20">
+    <p class="font-mono text-xs tracking-widest text-amber-600 uppercase dark:text-amber-400">
+      Research questions
+    </p>
+    <h1 class="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
+      What I am testing, not just what I am reading.
+    </h1>
+    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-neutral-400">
+      My research starts with failures observed in real systems. The business or user outcome
+      tells me which failures matter; I turn those into narrower questions, design an evaluation
+      that could prove the idea wrong, and carry useful results back into production.
+    </p>
+
+    <nav class="mt-8 flex flex-wrap gap-2 text-xs">
+      {activeInvestigations.map((item) => (
+        <a
+          href={`#${item.id}`}
+          class="rounded-md border border-neutral-200 px-3 py-1.5 font-mono text-neutral-600 hover:border-amber-500 hover:text-amber-600 dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
+        >
+          {item.area}
+        </a>
+      ))}
+      <a
+        href="#question-queue"
+        class="rounded-md border border-neutral-200 px-3 py-1.5 font-mono text-neutral-600 hover:border-amber-500 hover:text-amber-600 dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
+      >
+        Question queue
+      </a>
+    </nav>
+  </section>
+
+  <section class="border-y border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/30">
+    <div class="mx-auto grid max-w-5xl gap-6 px-6 py-8 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-10">
+      <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Working definition</p>
+      <p class="max-w-3xl text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+        Research is the disciplined reduction of uncertainty. Business outcomes determine
+        which uncertainty is worth reducing; shipping tests whether the answer was useful.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="space-y-8">
+      {activeInvestigations.map((item) => (
+        <article id={item.id} class="scroll-mt-24 rounded-xl border border-neutral-200 p-6 sm:p-8 dark:border-neutral-800">
+          <header class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                {item.area}
+              </p>
+              <h2 class="mt-2 text-2xl font-semibold tracking-tight">{item.title}</h2>
+            </div>
+            <span class="rounded-full bg-amber-100 px-2.5 py-1 font-mono text-[10px] font-medium text-amber-700 dark:bg-amber-400/10 dark:text-amber-400">
+              {item.status}
+            </span>
+          </header>
+
+          <div class="mt-6 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900/60">
+            <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Core question</p>
+            <p class="mt-2 text-base font-medium">{item.question}</p>
+          </div>
+
+          <div class="mt-7 grid gap-8 lg:grid-cols-2">
+            <div>
+              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Why it matters</h3>
+              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                {item.motivation}
+              </p>
+
+              <h3 class="mt-7 font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Current conclusion</h3>
+              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                {item.learned}
+              </p>
+            </div>
+
+            <div>
+              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">What I am doing</h3>
+              <ul class="mt-3 space-y-3">
+                {item.currentWork.map((work) => (
+                  <li class="flex gap-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                    <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-amber-500"></span>
+                    <span>{work}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {item.related && (
+                <a
+                  href={`${base}/projects#${item.related}`}
+                  class="mt-6 inline-block text-sm font-medium text-amber-600 hover:underline dark:text-amber-400"
+                >
+                  See the related system →
+                </a>
+              )}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section id="question-queue" class="scroll-mt-24 border-t border-neutral-200 dark:border-neutral-800">
+    <div class="mx-auto max-w-5xl px-6 py-16">
+      <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Question queue</p>
+      <h2 class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+        Problems I am reading and prototyping around
+      </h2>
+      <p class="mt-3 max-w-2xl text-sm text-neutral-600 dark:text-neutral-400">
+        These are directions, not claims of finished research. They are here to make my
+        technical interests concrete and falsifiable.
+      </p>
+
+      <div class="mt-8 grid gap-5 lg:grid-cols-3">
+        {questionQueue.map((item) => (
+          <article class="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+            <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+              {item.area}
+            </p>
+            <h3 class="mt-3 text-base font-semibold">{item.question}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+              {item.detail}
+            </p>
+            <p class="mt-5 border-t border-neutral-200 pt-4 font-mono text-[10px] leading-relaxed text-neutral-500 dark:border-neutral-800">
+              {item.lens}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-14">
+    <div class="rounded-xl bg-neutral-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8 dark:bg-neutral-100 dark:text-neutral-900">
+      <div>
+        <h2 class="text-xl font-semibold">The implementation side matters too.</h2>
+        <p class="mt-2 text-sm text-neutral-300 dark:text-neutral-600">
+          See how these questions turn into deployed systems and measurable constraints.
+        </p>
+      </div>
+      <a
+        href={`${base}/projects`}
+        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-amber-300 sm:mt-0 dark:bg-neutral-900 dark:text-white"
+      >
+        Explore selected work →
+      </a>
+    </div>
+  </section>
+</Layout>

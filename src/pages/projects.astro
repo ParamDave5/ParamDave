@@ -1,0 +1,311 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+type CaseStudy = {
+  id: string;
+  area: string;
+  title: string;
+  period: string;
+  question: string;
+  context: string;
+  approach: string[];
+  outcome: string;
+  evidence: string[];
+  stack: string[];
+  status?: string;
+};
+
+const caseStudies: CaseStudy[] = [
+  {
+    id: 'reliable-agents',
+    area: 'LLM systems',
+    title: 'Making agent failures diagnosable',
+    period: '2025 – Present',
+    question:
+      'How do you tell whether an agent failed at perception, generation, evaluation, or verification?',
+    context:
+      'The document mix included handwriting, low-resolution scans, complex layouts, and domain-specific symbols. Outputs also had to conform to a downstream schema, so a plausible answer was not enough when silent errors could propagate through the workflow.',
+    approach: [
+      'Benchmarked open-source vision-language models and paired LightOnOCR2 with a prompt-engineered LLM stage.',
+      'Built automated grading, adversarial probing, and red-teaming workflows with Promptfoo, Garak, and DeepEval.',
+      'Implemented BinEval-style failure decomposition and a verification database that learns from human corrections.',
+    ],
+    outcome:
+      'Shipped an intelligent document processing pipeline that runs at 2.1 pages per second, reaches 80% extraction accuracy across the difficult document mix, produces schema-valid output on 100% of evaluated runs, and reduces human review time by roughly 10×.',
+    evidence: ['2.1 pages / second', '80% extraction accuracy', '100% schema validity', '~10× less review time'],
+    stack: ['LightOnOCR2', 'Promptfoo', 'Garak', 'DeepEval', 'BinEval', 'vLLM'],
+  },
+  {
+    id: 'lidar-segmentation',
+    area: '3D perception',
+    title: 'Learning from severely imbalanced point clouds',
+    period: '2025',
+    question:
+      'How do you improve minority-class learning without sacrificing the rest of a large outdoor scene?',
+    context:
+      'The enterprise dataset contained approximately 3 million labeled points, including transmission towers and conductors. Utility point clouds are dominated by common classes while operationally important classes can be rare, so overall accuracy can hide the failures that matter.',
+    approach: [
+      'Built on RandLA-Net and KPConvNeXt with focal loss and class-balanced re-weighting.',
+      'Combined farthest-point and inverse-frequency sampling with targeted oversampling, tile-level rebalancing, and minority-class augmentation.',
+      'Improved the training, preprocessing, and annotation loops through caching, batched I/O, and a redesigned labeling workflow.',
+    ],
+    outcome:
+      'On held-out validation data, reached 92% IoU on the minority class and 98% IoU on the majority class, with 98% overall accuracy. Also shortened the iteration loop and mentored an intern through the modeling and data-pipeline work.',
+    evidence: ['~3M labeled points', '92% minority-class IoU', '98% majority-class IoU', '98% overall accuracy'],
+    stack: ['RandLA-Net', 'KPConvNeXt', 'PDAL', 'PyTorch', 'Focal Loss'],
+  },
+  {
+    id: 'reconstruction',
+    area: 'Research to production',
+    title: 'From reconstruction papers to a production pipeline',
+    period: '2024 – 2025',
+    question:
+      'What has to change when a promising 3D reconstruction method meets real images, runtime constraints, and deployment infrastructure?',
+    context:
+      'High-fidelity reconstruction from hundreds of high-resolution indoor images was useful only if processing time and rendering speed fit the operational workflow.',
+    approach: [
+      'Built a structure-from-motion pipeline with COLMAP and OpenSFM for 500+ image scenes.',
+      'Integrated Gaussian Splatting and 2DGS for photorealistic real-time rendering.',
+      'Moved to a GLOMAP-based architecture and containerized the pipeline for repeatable deployment.',
+    ],
+    outcome:
+      'On comparable scenes, enabled 30 FPS rendering and reduced processing for complex scenes to under 60 minutes—an 80% speed improvement over the earlier architecture.',
+    evidence: ['500+ image scenes', '30 FPS rendering', '<60 min processing', '80% faster on comparable scenes'],
+    stack: ['COLMAP', 'GLOMAP', 'OpenSFM', 'Gaussian Splatting', 'Docker'],
+  },
+  {
+    id: 'mobile-capture',
+    area: 'Active experiment',
+    title: 'On-device 3D capture with LiDAR priors',
+    period: '2024 – Present',
+    question:
+      'Can mobile depth and pose estimates make field capture simpler while improving downstream reconstruction?',
+    context:
+      'Manual survey workflows are cumbersome, while image-only reconstruction can struggle without useful geometric priors.',
+    approach: [
+      'Fuse ARKit SLAM with iPad LiDAR depth for in-field point-cloud capture.',
+      'Explore on-device and cloud-based Gaussian Splatting reconstruction paths.',
+      'Design the capture flow around the constraints of the person collecting the data.',
+    ],
+    outcome:
+      'The application is still in development. The current goal is a usable capture workflow and better depth priors—not a polished demo claim before the system earns it.',
+    evidence: ['ARKit pose', 'LiDAR depth', 'On-device + cloud paths'],
+    stack: ['Swift', 'ARKit', 'LiDAR', 'SLAM', 'Gaussian Splatting'],
+    status: 'In progress',
+  },
+];
+
+const earlierWork = [
+  {
+    group: 'Computer Vision',
+    projects: [
+      ['Structure from Motion', '2022', 'A from-scratch SfM pipeline covering geometry, triangulation, and bundle adjustment.', 'https://github.com/ParamDave5/Structure-From-Motion'],
+      ['Stereo Vision', '2022', 'Calibration, rectification, correspondence, and metric depth from stereo imagery.', 'https://github.com/ParamDave5/Stereo-Vision'],
+      ['Lane Detection & Guidance', '2022', 'Lane-boundary detection and turn guidance using perspective warping and polynomial fitting.', 'https://github.com/ParamDave5/Lane-Detection'],
+      ['AR Tag Detection', '2022', 'Homography-based tag decoding with real-time image and 3D cube overlays.', 'https://github.com/ParamDave5/AprilTag-Homography'],
+      ['Probability-Based Boundary Detection', '2021', 'A simplified PB detector combining texture, color, and intensity gradients.', 'https://github.com/ParamDave5/Probability-Based-Boundary-Detection'],
+      ['Panorama Stitching', '2021', 'Automatic multi-image stitching with feature matching and homography-based warping.', 'https://github.com/ParamDave5/Panoram-Stiching'],
+      ['Face Swap', '2021', 'Face warping and blending with Delaunay triangulation and Thin Plate Splines.', 'https://github.com/ParamDave5/FaceSwap'],
+      ['Camera Calibration', '2021', 'Automatic intrinsic and extrinsic calibration from checkerboard imagery.', 'https://github.com/ParamDave5/AutoCalib'],
+    ],
+  },
+  {
+    group: 'Deep Learning',
+    projects: [
+      ['Gesture-Operated Robot', '2022', 'A Jetson Nano robot controlled by gestures from a lightweight OpenPose model at 20 FPS.', 'https://github.com/ParamDave5/Pose-Estimation-Gesture-Operated-Robot'],
+      ['3D MRI CNN Super-Resolution', '2022', 'Reproduced and extended CNN-IL, improving SSIM and PSNR with a custom architecture.', 'https://github.com/ParamDave5/3D-MRI-CNN-Super-Resolution'],
+      ['SfMLearner', '2022', 'Extended monocular depth and ego-motion learning with a ResNet backbone and SSIM loss.', 'https://github.com/ParamDave5/SFM-Learner'],
+    ],
+  },
+  {
+    group: 'Machine Learning',
+    projects: [
+      ['Handwritten Digit Recognition', '2022', 'Implemented classical classifiers and LeNet-5 from scratch.', 'https://github.com/ParamDave5/Handwritten-Digit-Recognition-and-Transfer-Learning'],
+      ['Face & Expression Recognition', '2022', 'Compared Bayes, kNN, Kernel SVM, and Boosted SVM with PCA/MDA.', 'https://github.com/ParamDave5/Facial-Recognition'],
+      ['Monkey Species Classification', '2022', 'Transfer-learned ResNet-34 and ResNet-50 after building a custom CNN baseline.', 'https://github.com/ParamDave5/Handwritten-Digit-Recognition-and-Transfer-Learning'],
+    ],
+  },
+  {
+    group: 'Robotics & Planning',
+    projects: [
+      ['Real-Time RRT*', '2022', 'Continuous replanning for a holonomic robot with dynamic obstacles and a moving goal.', 'https://github.com/ParamDave5/Real-Time-RRT'],
+      ['A* on TurtleBot 3', '2022', 'Path planning with obstacle inflation and real-time replanning in Gazebo.', 'https://github.com/ParamDave5/A-Star-on-TurtleBot'],
+      ['Planning Algorithms Benchmark', '2022', 'Compared BFS, Dijkstra, A*, and RT-RRT* on differential-drive robots.', 'https://github.com/ParamDave5/Path_Planning-Algorithms'],
+      ['Urban Search & Rescue Robot', '2021', 'Coordinated two TurtleBots using AprilTags, transforms, and MoveBase.', 'https://github.com/ParamDave5/Simplified-Urban-Search-and-Rescue'],
+      ['LQR / LQG Crane Control', '2021', 'Modeled and controlled a nonlinear crane double pendulum in MATLAB.', 'https://github.com/ParamDave5/LQR-LQG-Control-for-Double-Pendulum'],
+    ],
+  },
+];
+---
+<Layout
+  title="Selected Work — Param Dave"
+  description="Case studies in reliable LLM systems, 3D perception, and turning machine-learning research into production systems."
+>
+  <section class="mx-auto max-w-5xl px-6 pt-16 pb-12 sm:pt-20">
+    <p class="font-mono text-xs tracking-widest text-amber-600 uppercase dark:text-amber-400">
+      Selected work
+    </p>
+    <h1 class="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
+      Business constraints, research questions, shipped systems.
+    </h1>
+    <p class="mt-5 max-w-2xl text-lg text-neutral-600 dark:text-neutral-400">
+      Each case starts with an outcome that matters, works down through the technical
+      uncertainty, and ends with something measurable, reliable, and useful in a real workflow.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-2 text-xs">
+      {caseStudies.map((study) => (
+        <a
+          href={`#${study.id}`}
+          class="rounded-md border border-neutral-200 px-3 py-1.5 font-mono text-neutral-600 hover:border-amber-500 hover:text-amber-600 dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
+        >
+          {study.area}
+        </a>
+      ))}
+    </div>
+    <p class="mt-6 max-w-2xl text-xs leading-relaxed text-neutral-500">
+      These case studies intentionally describe the technical decisions and outcomes without
+      exposing proprietary data, customer material, or internal system details.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 pb-16">
+    <div class="space-y-8">
+      {caseStudies.map((study) => (
+        <article id={study.id} class="scroll-mt-24 rounded-xl border border-neutral-200 p-6 sm:p-8 dark:border-neutral-800">
+          <header class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                  {study.area}
+                </p>
+                {study.status && (
+                  <span class="rounded-full bg-amber-100 px-2 py-0.5 font-mono text-[10px] text-amber-700 dark:bg-amber-400/10 dark:text-amber-400">
+                    {study.status}
+                  </span>
+                )}
+              </div>
+              <h2 class="mt-2 text-2xl font-semibold tracking-tight">{study.title}</h2>
+            </div>
+            <span class="font-mono text-xs text-neutral-500">{study.period}</span>
+          </header>
+
+          <div class="mt-6 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900/60">
+            <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Core question</p>
+            <p class="mt-2 text-base font-medium">{study.question}</p>
+          </div>
+
+          <div class="mt-7 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+            <div>
+              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">The constraint</h3>
+              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                {study.context}
+              </p>
+
+              <h3 class="mt-7 font-mono text-[10px] tracking-widest text-neutral-500 uppercase">What shipped</h3>
+              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                {study.outcome}
+              </p>
+            </div>
+
+            <div>
+              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Investigation → system</h3>
+              <ol class="mt-3 space-y-3">
+                {study.approach.map((step, index) => (
+                  <li class="flex gap-3 rounded-lg border border-neutral-200 p-3 text-sm leading-relaxed dark:border-neutral-800">
+                    <span class="font-mono text-[10px] text-amber-600 dark:text-amber-400">
+                      0{index + 1}
+                    </span>
+                    <span class="text-neutral-700 dark:text-neutral-300">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          <footer class="mt-7 grid gap-5 border-t border-neutral-200 pt-5 sm:grid-cols-2 dark:border-neutral-800">
+            <div>
+              <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Evidence</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                {study.evidence.map((item) => (
+                  <span class="rounded-md bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Tools</p>
+              <p class="mt-2 font-mono text-[11px] leading-relaxed text-neutral-500">
+                {study.stack.join(' · ')}
+              </p>
+            </div>
+          </footer>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="border-t border-neutral-200 dark:border-neutral-800">
+    <div class="mx-auto max-w-5xl px-6 py-14">
+      <details class="group">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-6">
+          <div>
+            <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Earlier work</p>
+            <h2 class="mt-2 text-2xl font-semibold tracking-tight">Coursework and foundations</h2>
+            <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+              Computer vision, deep learning, classical ML, robotics, and planning projects from 2021–22.
+            </p>
+          </div>
+          <span class="text-2xl text-neutral-400 transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+        </summary>
+
+        <div class="mt-10 space-y-10">
+          {earlierWork.map((group) => (
+            <section>
+              <h3 class="border-b border-neutral-200 pb-3 text-lg font-semibold dark:border-neutral-800">
+                {group.group}
+              </h3>
+              <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                {group.projects.map(([title, year, description, github]) => (
+                  <article class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+                    <div class="flex items-start justify-between gap-3">
+                      <h4 class="text-sm font-semibold">{title}</h4>
+                      <span class="font-mono text-[10px] text-neutral-500">{year}</span>
+                    </div>
+                    <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{description}</p>
+                    <a
+                      href={github}
+                      target="_blank"
+                      rel="noopener"
+                      class="mt-3 inline-block text-xs font-medium text-amber-600 hover:underline dark:text-amber-400"
+                    >
+                      GitHub ↗
+                    </a>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-14">
+    <div class="rounded-xl bg-neutral-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8 dark:bg-neutral-100 dark:text-neutral-900">
+      <div>
+        <h2 class="text-xl font-semibold">Want the chronological version?</h2>
+        <p class="mt-2 text-sm text-neutral-300 dark:text-neutral-600">
+          The experience page contains the full role-by-role record.
+        </p>
+      </div>
+      <a
+        href={`${base}/experience`}
+        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-amber-300 sm:mt-0 dark:bg-neutral-900 dark:text-white"
+      >
+        View experience →
+      </a>
+    </div>
+  </section>
+</Layout>

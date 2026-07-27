@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const roles = [
+  {
+    company: 'TRC Inc',
+    title: 'Senior Machine Learning Engineer',
+    period: 'Mar 2025 – Present',
+    location: 'Remote, India',
+    current: true,
+    bullets: [
+      'Shipped an Intelligent Document Processing pipeline converting engineering PDFs to schema-constrained JSON: benchmarked open-source VLMs, paired LightOnOCR2 with a prompt-engineered LLM stage, and closed the loop with a verification database that learns from human corrections. Reached 2.1 pages per second, 80% extraction accuracy across handwritten, low-resolution, and complex-layout documents, 100% schema validity, and roughly a 10× reduction in review time.',
+      'Built the team’s LLM eval harness: automated grading, adversarial probing, and red-teaming with Promptfoo, Garak, and DeepEval, plus a custom BinEval implementation that decomposes failing runs into specific failure modes. Adapted Genie into a synthetic document Q&A generation pipeline tuned for human-like questions.',
+      'Trained a custom LiDAR segmentation architecture based on RandLA-Net and KPConvNeXt on approximately 3 million labeled points spanning transmission towers and conductors. On held-out validation data, reached 92% minority-class IoU and 98% majority-class IoU, with 98% overall accuracy. Used minority-class focused sampling, focal loss, and class-balanced re-weighting; cut training and preprocessing time through caching and batched I/O; and mentored an intern through the project.',
+      'Designed LLM evaluation frameworks that turn sprint outputs, PRs, and design docs into measurable signals for team feedback loops and leadership visibility.',
+      'Running production LLM inference on vLLM tuned to real traffic patterns; researching quantization, speculative decoding, and serving topologies across vLLM, SGLang, and llama.cpp.',
+    ],
+  },
+  {
+    company: 'TRC Inc',
+    title: 'AI/ML Computer Vision Engineer',
+    period: 'Dec 2023 – Mar 2025',
+    location: 'Remote, USA',
+    current: false,
+    bullets: [
+      'Designed a robust pipeline to filter human-containing images and perform accurate object detection in utility environments. Improved model accuracy by 15% and reduced annotation time by 20% via a custom Label Studio workflow.',
+      'Built a full SfM pipeline using COLMAP and OpenSFM to generate high-fidelity 3D meshes from 500+ high-resolution indoor images, completing reconstruction in under 6 hours.',
+      'Integrated Gaussian Splatting and 2DGS techniques into the SfM pipeline enabling real-time (30 FPS) photo-realistic rendering. On comparable scenes, achieved an 80% speed improvement using a GLOMAP-based architecture, reducing processing time to under 60 minutes for complex scenes. Dockerized the full pipeline for scalable deployment.',
+      'Created a custom font library using FontForge and generated 15,000+ synthetic images. Trained an OCR model capable of recognizing technical symbols and custom fonts across engineering documents.',
+      'Developed end-to-end pipelines for annotating, training, and evaluating LiDAR datasets using ArcGIS and the PDAL library, enabling efficient handling of large .las files and complex geospatial operations.',
+      'Trained and benchmarked PointCNN and RandLANet for vegetation encroachment detection. Engineered a conductor-vegetation intersection detection system using SciPy KDTree, achieving 80% accuracy in identifying hazard zones across utility infrastructure.',
+      'Currently developing an iOS app using Gaussian Splatting for on-device/cloud 3D modeling, improving data collection and depth priors using iPad LiDAR.',
+    ],
+  },
+  {
+    company: 'B Garage',
+    title: 'Research Intern',
+    period: 'Jun 2022 – Dec 2022',
+    location: 'San Jose, CA',
+    current: false,
+    bullets: [
+      'Conducted in-depth analysis of classical depth estimation methods using stereo pair and monocular fisheye cameras. Enhanced fisheye calibration with Kannala Brandt and Double Sphere Camera Models, improving field of view by 30° and reducing computation time by 20%.',
+      'Led improvement of transformer-based SOTA monocular depth estimation, achieving real-time inference on Nvidia Xavier NX.',
+      'Implemented Knowledge Distillation, Pruning, and Quantization, reducing inference time by 20%.',
+      'Curated real and synthetic warehouse depth datasets using Isaac Sim to train the networks, increasing test accuracy by 6%.',
+      'Engineered a geometry-based real-time video depth estimation network tailored to deployment requirements on Nvidia Xavier NX.',
+    ],
+  },
+];
+---
+<Layout title="Experience — Param Dave">
+  <section class="mx-auto max-w-3xl px-6 pt-20 pb-12">
+    <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Experience</h1>
+    <p class="mt-4 text-neutral-600 dark:text-neutral-400">
+      Where I've shipped things that ended up in front of real users.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-6 pb-16">
+    <div class="space-y-12">
+      {roles.map((role) => (
+        <article class="border-l-2 border-neutral-200 pl-6 dark:border-neutral-800">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 class="text-lg font-semibold">
+              {role.title} · <span class="text-amber-600 dark:text-amber-400">{role.company}</span>
+            </h2>
+            <div class="flex items-center gap-2">
+              {role.current && (
+                <span class="rounded-full bg-amber-100 px-2 py-0.5 font-mono text-[10px] font-medium text-amber-700 dark:bg-amber-400/10 dark:text-amber-400">
+                  current
+                </span>
+              )}
+              <span class="font-mono text-xs text-neutral-500">{role.period}</span>
+            </div>
+          </div>
+          <p class="mt-1 text-sm text-neutral-500">{role.location}</p>
+          <ul class="mt-4 space-y-3 text-neutral-700 dark:text-neutral-300">
+            {role.bullets.map((b) => (
+              <li class="flex gap-3">
+                <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-amber-500"></span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+</Layout>

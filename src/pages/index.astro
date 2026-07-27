@@ -1,0 +1,219 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const featuredWork = [
+  {
+    id: 'reliable-agents',
+    label: 'LLM systems',
+    title: 'Finding why an agent failed',
+    question: 'Can an evaluation explain a failure instead of hiding it inside one score?',
+    summary:
+      'Built an evaluation harness for automated grading, adversarial probing, and failure-mode decomposition, then connected that thinking to a production document pipeline.',
+    evidence: '2.1 pages/s · 100% schema validity · ~10× less review time',
+    flow: ['Probe', 'Grade', 'Diagnose'],
+  },
+  {
+    id: 'lidar-segmentation',
+    label: '3D perception',
+    title: 'Learning the classes that data forgets',
+    question: 'How do you improve rare-class performance without destabilizing the whole model?',
+    summary:
+      'Iterated on a RandLA-Net and KPConvNeXt-based segmentation system with targeted sampling, class-aware loss design, and a faster data loop.',
+    evidence: '92% minority-class IoU · 98% overall accuracy',
+    flow: ['Rebalance', 'Segment', 'Inspect'],
+  },
+  {
+    id: 'reconstruction',
+    label: 'Research to production',
+    title: 'Turning reconstruction papers into a usable pipeline',
+    question: 'What has to change when a promising 3D method meets real data and deployment constraints?',
+    summary:
+      'Combined SfM, GLOMAP, Gaussian Splatting, and containerized infrastructure for faster reconstruction and real-time scene rendering.',
+    evidence: '30 FPS · <60 min · 80% faster on comparable scenes',
+    flow: ['Capture', 'Reconstruct', 'Render'],
+  },
+];
+---
+<Layout>
+  <section class="mx-auto max-w-5xl px-6 pt-16 pb-16 sm:pt-20">
+    <div class="grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
+      <div>
+        <p class="font-mono text-xs tracking-widest text-amber-600 uppercase dark:text-amber-400">
+          Research engineer · product builder
+        </p>
+        <h1 class="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+          I turn business objectives into reliable AI systems.
+        </h1>
+        <p class="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-neutral-400">
+          I connect high-level KPIs to model behavior, run the research needed to close
+          the gap, and ship the application around it—from LLM systems to 3D perception.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            href={`${base}/projects`}
+            class="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-amber-400 dark:text-neutral-900 dark:hover:bg-amber-300"
+          >
+            Explore selected work →
+          </a>
+          <a
+            href={`${base}/research`}
+            class="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-900 hover:border-neutral-500 dark:border-neutral-700 dark:text-neutral-100 dark:hover:border-neutral-500"
+          >
+            Research questions
+          </a>
+        </div>
+      </div>
+
+      <div class="order-first md:order-last">
+        <img
+          src={`${base}/me.jpg`}
+          alt="Param Dave"
+          class="h-36 w-36 rounded-full object-cover ring-2 ring-neutral-200 ring-offset-4 ring-offset-white sm:h-44 sm:w-44 md:h-52 md:w-52 dark:ring-neutral-800 dark:ring-offset-neutral-950"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 pb-4">
+    <div class="grid gap-3 sm:grid-cols-3">
+      <div class="flex min-h-24 flex-col justify-center rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+        <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Align</p>
+        <p class="mt-1 text-sm font-medium">Business KPIs and workflow constraints</p>
+      </div>
+      <div class="flex min-h-24 flex-col justify-center rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+        <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Investigate</p>
+        <p class="mt-1 text-sm font-medium">Model behavior, data, and evaluation</p>
+      </div>
+      <div class="flex min-h-24 flex-col justify-center rounded-lg border border-neutral-200 p-5 dark:border-neutral-800">
+        <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Ship</p>
+        <p class="mt-1 text-sm font-medium">Applications and production systems</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Selected work</p>
+        <h2 class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+          Business problems that became measurable systems
+        </h2>
+      </div>
+      <a href={`${base}/projects`} class="text-sm font-medium text-amber-600 hover:underline dark:text-amber-400">
+        View all work →
+      </a>
+    </div>
+
+    <div class="mt-8 grid gap-5 lg:grid-cols-3">
+      {featuredWork.map((work) => (
+        <article class="flex flex-col rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+          <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+            {work.label}
+          </p>
+          <h3 class="mt-3 text-lg font-semibold leading-snug">{work.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+            {work.question}
+          </p>
+          <div class="my-5 flex items-center" aria-hidden="true">
+            {work.flow.map((step, index) => (
+              <>
+                <span class="rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1 font-mono text-[10px] text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+                  {step}
+                </span>
+                {index < work.flow.length - 1 && <span class="mx-1 text-neutral-300 dark:text-neutral-700">→</span>}
+              </>
+            ))}
+          </div>
+          <p class="flex-1 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+            {work.summary}
+          </p>
+          <p class="mt-4 border-t border-neutral-200 pt-4 font-mono text-[10px] text-neutral-500 dark:border-neutral-800">
+            {work.evidence}
+          </p>
+          <a
+            href={`${base}/projects#${work.id}`}
+            class="mt-4 text-sm font-medium text-amber-600 hover:underline dark:text-amber-400"
+          >
+            Read the case study →
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="border-t border-neutral-200 dark:border-neutral-800">
+    <div class="mx-auto grid max-w-5xl gap-10 px-6 py-16 md:grid-cols-[0.8fr_1.2fr] md:gap-16">
+      <div>
+        <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">How I work</p>
+        <h2 class="mt-2 text-2xl font-semibold tracking-tight">Connect the KPI to the model—and back.</h2>
+        <p class="mt-4 text-neutral-600 dark:text-neutral-400">
+          I move between business, product, system, and model layers. The goal is not
+          merely a better benchmark; it is a technical improvement that survives deployment
+          and moves the outcome the business actually cares about.
+        </p>
+      </div>
+      <ol class="grid gap-3 sm:grid-cols-2">
+        {[
+          ['01', 'Define the outcome', 'Start with the KPI and the workflow it represents.'],
+          ['02', 'Decompose the problem', 'Translate it into product, system, and model behaviors.'],
+          ['03', 'Research and measure', 'Run the smallest experiment that can disprove the idea.'],
+          ['04', 'Ship and close the loop', 'Deploy, measure impact, and feed failures into the next iteration.'],
+        ].map(([number, title, copy]) => (
+          <li class="rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900/60">
+            <span class="font-mono text-[10px] text-amber-600 dark:text-amber-400">{number}</span>
+            <h3 class="mt-2 text-sm font-semibold">{title}</h3>
+            <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">{copy}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl border-t border-neutral-200 px-6 py-12 dark:border-neutral-800">
+    <div class="flex items-baseline justify-between">
+      <h2 class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Now</h2>
+      <span class="font-mono text-[11px] text-neutral-400">Jul 2026</span>
+    </div>
+    <div class="mt-6 grid gap-8 md:grid-cols-2 md:gap-12">
+      <div>
+        <h3 class="text-base font-semibold">Shipping</h3>
+        <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+          Agent harness design, evaluation systems, and an intelligent document processing
+          pipeline—plus computer vision when the problem calls for it.
+        </p>
+      </div>
+      <div>
+        <h3 class="text-base font-semibold">Investigating</h3>
+        <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+          GRPO, DAPO, and PaPO post-training, faithful visual reasoning, gated reward
+          design, and the gap between inference benchmarks and production behavior.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-14">
+    <div class="rounded-xl bg-neutral-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-10 sm:p-8 dark:bg-neutral-100 dark:text-neutral-900">
+      <div>
+        <p class="font-mono text-[10px] tracking-widest text-amber-400 uppercase dark:text-amber-600">
+          Where I add the most value
+        </p>
+        <h2 class="mt-2 text-xl font-semibold">
+          Problems that are commercially important and technically ambiguous.
+        </h2>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-300 dark:text-neutral-600">
+          I can own the path from KPI and evaluation design through research, model work,
+          application engineering, and production delivery.
+        </p>
+      </div>
+      <a
+        href="mailto:param10.dave@gmail.com"
+        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-amber-300 sm:mt-0 dark:bg-neutral-900 dark:text-white"
+      >
+        Start a conversation →
+      </a>
+    </div>
+  </section>
+</Layout>
