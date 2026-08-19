@@ -5,3 +5,6 @@ dist/
 .env
 .env.production
 *.log
+
+# Previous HTML5 UP site — kept locally, recoverable from git history
+_archive/
