@@ -1,9 +1,59 @@
 PORTFOLIO IMPROVEMENT BACKLOG
 =============================
 Prioritized changes to take the site from B+ to A.
+Last audited: 2026-08-19.
 
 
-TIER 1 — DO THESE TO ACTUALLY MOVE THE NEEDLE
+AUGUST 2026 EDITION
+-------------------
+[x] experience.astro: "improved model accuracy by 15%" - points or relative?
+    Answered: absolute. Now reads "improved detection accuracy by 15 percentage
+    points". Named the metric too; "model accuracy" alone was ambiguous.
+
+[x] Homepage stated the four-step process twice - the card row and the numbered
+    01-04 list said the same four things, 300px apart.
+    Removed the card row. The 01-04 list kept its framing paragraph.
+
+[x] Remove redundant claims on About.
+    "I go from business outcome to model and own it end to end" appeared four
+    times: h1, paragraph 1, paragraph 3, and the "Working principles" cards -
+    which ALSO duplicated the home page's How I work list. Cut to one statement
+    plus the aside's "Operating range" row. Working principles section removed
+    entirely; recoverable from git if you want it back somewhere unique.
+
+[x] LiDAR case study: say who actually annotated the data.
+    Two months, one intern, ~3M points. Also explains why the labeling
+    workflow got redesigned.
+
+[ ] DECIDE: visual for the Gaussian Splatting case study.
+    Stock .spz was considered and NOT taken - see notes at the bottom of this
+    file. Recommended path: capture your own scene with the iPad app you
+    already built. It is your data, no NDA, and it doubles as proof for the
+    mobile-capture case study.
+
+[ ] Add a "Not doing" column to the Now section on Home.
+    Two columns of things you ARE doing reads like a status report.
+    A third column of what you're deliberately avoiding reads like a person.
+    Needs a real answer - do not invent one.
+
+[ ] Real work imagery for the other four current case studies.
+    Cheapest NDA-safe wins: a failed 3DGS render, a terminal mid-training-run,
+    an annotated LiDAR tile with the conductor class highlighted, an eval
+    harness failure-mode breakdown with the labels blurred.
+
+[ ] LiDAR case study: state the class imbalance ratio and the baseline
+    minority-class IoU before rebalancing. Both turn the approach list
+    into evidence. (See the 32% -> 80% treatment on the IDP case study.)
+
+[ ] Decide on the Steve Jobs quote in the top banner.
+    It currently gets better placement than your own name.
+
+[ ] Extend the handwritten annotation layer (font + arrow + marker already
+    built). Candidates discussed: the 32% -> 80% metric, the earlier-work
+    section, the JIRA entry on Skills.
+
+
+TIER 1 - DO THESE TO ACTUALLY MOVE THE NEEDLE
 ---------------------------------------------
 [ ] Add a /writing or /blog page. Start with one essay (800-1500 words).
     Suggested topics:
@@ -11,55 +61,78 @@ TIER 1 — DO THESE TO ACTUALLY MOVE THE NEEDLE
       - "From 3DGS paper to 30 FPS in production"
       - "Why agentic systems still don't work reliably"
 
-[ ] Write one flagship case study. Pick IDP pipeline OR Gaussian Splatting + GLOMAP.
-    Structure: Problem -> Approaches tried -> What worked -> What broke -> Numbers -> Screenshot/diagram
-    Target: ~600 words.
+[~] Write one flagship case study. IDP is closest - held-out set, baseline,
+    throughput, schema validity, and now the approach that failed
+    (end-to-end LLM, PDF in / structured output out) with the architectural
+    reason it failed. Still missing: ~600 words and one diagram.
+    Suggested diagram: the two pipelines side by side, one box vs. three,
+    with the failure-attribution boundary drawn between OCR and extraction.
 
-[ ] Replace coursework with current side projects on Projects page.
-    Move 2021-2022 academic work into a collapsed "Earlier Work" section at bottom.
-    The Senior label demands it.
+[ ] Add a `deadEnd` to the other four case studies. The field already exists
+    on the CaseStudy type and renders above "Investigation -> system".
+    Nobody else's portfolio has this. Needs real answers - do not invent them.
+
+[x] Replace coursework with current side projects on Projects page.
+    Five current case studies up top; 2021-22 academic work collapsed into an
+    "Earlier Work" <details> at the bottom, with imagery.
 
 [ ] Add at least one image to Research page.
-    (architecture diagram, Gaussian Splatting render GIF, or LiDAR segmentation output)
+    Still zero. Architecture diagram or a grounded-vs-ungrounded attention
+    comparison would carry the most weight.
+
+[ ] Wire src/data/reading.ts into the Research page, or delete it.
+    Dead code today - the file exists and is imported by nothing. Its
+    `connection` field (why each paper matters to your own work) is better
+    material than anything currently on the page.
 
 
-TIER 2 — QUICK WINS, LOW EFFORT
+TIER 2 - QUICK WINS, LOW EFFORT
 -------------------------------
-[x] Add OG image (designed 1200x630 PNG with name, tagline, photo, amber accent)
+[x] Add OG image (1200x630 PNG with name, tagline, photo, amber accent)
     Generated via SVG -> headless Chrome render. Source: public/og.svg
 [x] Trim Skills page to 6 core sections + "Also familiar with" footer
 [x] Add favicon variants (apple-touch-icon.png generated via qlmanage)
-[x] Add "Now" snippet on Home (May 2026: agent harness, eval, IDP)
+[x] Add "Now" snippet on Home
     Reminder: update this monthly so the site feels alive
-[x] Education already above Beyond Work on About page (was already correct)
-[x] Bonus: Removed redundant "Find me" section from Home (duplicated footer)
+[x] Education already above Beyond Work on About page
+[x] Removed redundant "Find me" section from Home (duplicated footer)
+[x] Accessibility pass: skip link, contrast to WCAG AA, aria-current,
+    aria-pressed on the theme toggle, prefers-reduced-motion handling
+[x] Asset weight: photo 228KB -> 19KB, GIFs 9.4MB -> 157KB as MP4 + poster
+[x] SEO: sitemap, robots.txt, per-page descriptions, JSON-LD Person schema
+[x] De-duplicate email / resume URL / paper count into src/data/site.ts
+[x] 404 page
 
 
-TIER 3 — NICE TO HAVE
+TIER 3 - NICE TO HAVE
 ---------------------
-[ ] Add a "core question" line to each Research domain
-    (what you're actually trying to figure out)
-[ ] Add publications/talks/contributions section even if empty for now
-    ("nothing public yet, working on it" is more honest than absence)
+[x] Add a "core question" line to each Research domain
+    All three pillars now lead with one.
+[x] Add publications/talks/contributions section even if empty for now
+    "Work in progress, claims when earned" block at the bottom of Research.
+[x] Add a "what I'm reading" widget (3-5 papers)
+    Overshot: 12 papers with focus lines across the PI and NVIDIA groups.
 [ ] Add <link rel="alternate"> RSS feed if you start blogging
 [ ] Set up basic analytics (Plausible or Umami, both privacy-friendly)
-[ ] Add a small "what I'm reading" widget (3-5 papers you're currently chewing on)
-    Cheap signal of taste.
+    Confirmed: none installed today.
 
 
-TIER 4 — CONTENT / VOICE POLISH
+TIER 4 - CONTENT / VOICE POLISH
 -------------------------------
-[x] Drop "Senior Machine Learning Engineer · TRC Inc" from Home hero
-[x] Tighten the Home pitch from 3 sentences to 2
-[x] Remove "Find me" section from Home (duplicates the footer)
-[ ] Add date stamps to research items so visitors know what's fresh
+[x] Drop "Senior Machine Learning Engineer - TRC Inc" from Home hero
+[x] Tighten the Home pitch
+[x] Remove "Find me" section from Home
+[x] De-AI-ify pass: mono-caps labels 37 -> 6, bordered cards 14 -> 6,
+    cold neutral greys -> warm stone, contractions, handwritten photo caption
+[ ] Add date stamps to research items so visitors know what's fresh.
+    Pillars carry a status ("New research direction", "Built & evolving")
+    but no dates, so nothing tells a visitor whether this is current.
 
 
-TIER 5 — STRUCTURAL IDEAS TO CONSIDER
+TIER 5 - STRUCTURAL IDEAS TO CONSIDER
 -------------------------------------
-[ ] Add a /notes or /garden section for half-formed ideas (lower bar than blog posts)
+[ ] Add a /notes or /garden section for half-formed ideas (lower bar than blog)
 [ ] Consider an interactive demo for one project
-    (even a static HuggingFace Space link)
 [ ] Add a "How I work" page if you want to attract specific kinds of teams
 
 
@@ -67,12 +140,45 @@ GAPS THAT ARE HURTING THE MOST RIGHT NOW
 ----------------------------------------
 1. No writing / blog -> can't demonstrate thinking quality at scale
 2. Everything is at the same depth -> no "here's how I actually think" project
-3. Zero images on Research/Projects -> all text, no proof
-4. Projects page is mostly old coursework -> wrong signal for a Senior role
-5. No public artifacts (papers, talks, OSS contributions, demos)
+3. Zero images on Research, and zero on the five CURRENT case studies.
+   (Earlier Work is now fully illustrated - the recent work is not.)
+4. No public artifacts (papers, talks, OSS contributions, demos)
+5. reading.ts is dead code containing your best-written material
 
 
 HIGHEST-LEVERAGE NEXT MOVE
 --------------------------
-Tier 1 #2: Write the flagship case study (IDP or Gaussian Splatting).
-Single biggest jump in perceived seniority for the smallest amount of work.
+Tier 1 #2: finish the IDP flagship case study - add the approach that failed,
+one diagram, and take it to ~600 words. Biggest jump in perceived seniority
+for the smallest amount of work.
+
+
+NOTE: WHY THE STOCK .spz WAS NOT USED (2026-08-19)
+--------------------------------------------------
+Idea: since client scenes are under NDA, embed an open-source stock .spz
+splat on the reconstruction case study instead.
+
+Checked and rejected for now, on three grounds:
+
+1. LICENSING. The obvious candidates are not cleanly licensed.
+   - sparkjs.dev demo assets (butterfly.spz 4.0MB, valley.spz 6.8MB): the
+     Spark renderer is MIT, but the demo splats ship with no license file.
+   - INRIA / original 3DGS pretrained models: research / non-commercial only.
+   - Hugging Face "gaussian splat" datasets: mostly individual uploads with
+     self-declared licenses on scenes they may not own.
+   Not what you want sitting on a page recruiters read.
+
+2. PAYLOAD. 4-7MB for the splat plus three.js + Spark, on a site whose entire
+   built output is 1.2MB. Solvable with click-to-load, but still real.
+
+3. IT PROVES THE WRONG THING. A stock splat demonstrates you can embed
+   somebody else's file. It does not demonstrate you built the pipeline.
+
+Better move: the NDA covers client scenes, not the method. Capture a scene
+with the iPad app you already built - a stairwell, a park bench, your desk.
+That asset is yours, has no licensing question, IS your own pipeline output,
+and simultaneously gives the mobile-capture case study its first visual.
+
+If you still want it interactive after that, the build is: Spark (MIT) +
+three.js, click-to-load behind the poster frame so it costs nothing until
+someone opts in, with a static render as the fallback.

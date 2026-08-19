@@ -1,0 +1,899 @@
+---
+const stages = [
+  {
+    number: '01',
+    title: 'Prepare',
+    subtitle: 'Source content',
+    zone: [2, 31],
+    paper: 'Clean and transform source material into content that can support task-specific examples.',
+    adaptation:
+      'Engineering documents become bounded source contexts, so every generated example begins with evidence rather than a free-form prompt.',
+    output: 'Grounded content units',
+  },
+  {
+    number: '02',
+    title: 'Generate',
+    subtitle: 'Candidate Q&A',
+    zone: [31, 57],
+    paper: 'Generate task-specific examples from the prepared content.',
+    adaptation:
+      'The generation stage is tuned toward questions that resemble real user intent, not the overly neat phrasing common in synthetic datasets.',
+    output: 'Human-like Q&A candidates',
+  },
+  {
+    number: '03',
+    title: 'Filter',
+    subtitle: 'Quality gate',
+    zone: [57, 75],
+    paper: 'Remove examples that are low quality, unfaithful, or insufficiently grounded in the source.',
+    adaptation:
+      'Candidate pairs pass three gates: source grounding, user-like intent, and evaluation utility. Plausible wording is not enough if the answer is unsupported or the question would not reveal useful behavior.',
+    output: 'Grounded, usable pairs',
+  },
+  {
+    number: '04',
+    title: 'Evaluate',
+    subtitle: 'Reusable cases',
+    zone: [75, 98],
+    paper: 'The paper produces content-grounded datasets for downstream tasks.',
+    adaptation:
+      'Retained examples become repeatable quality gates before release and regression cases when production exposes a new failure mode.',
+    output: 'Pre- and post-production eval set',
+  },
+];
+
+// --- Scene ------------------------------------------------------------------
+// The whole point of the picture is the contrast between the two halves. Intake
+// is unsorted: documents tumble in at random heights and attitudes, each on its
+// own loop. Everything downstream of the generator is a lane -- one element per
+// lane, marching by exactly one chip pitch, so a whole row costs one animation
+// instead of one per chip. Attrition shows up as the lanes thinning at each
+// gate rather than as items being thrown away.
+
+const SPEED = 4.4; // percent of scene width per second, shared by every stream
+
+const GATES = [
+  { id: 'grounded', x: 57, label: 'Grounded', kept: 65 },
+  { id: 'intent', x: 66, label: 'User-like', kept: 35 },
+  { id: 'utility', x: 75, label: 'Useful', kept: 15 },
+];
+
+// Lane pitch widens after each gate. Density, not disappearing objects, is what
+// carries 100 -> 65 -> 35 -> 15.
+const segments = [
+  { x0: 31.5, x1: 56.5, pitch: 2.5 },
+  { x0: 57.5, x1: 65.5, pitch: 3.8 },
+  { x0: 66.5, x1: 74.5, pitch: 5.4 },
+];
+
+const lanes = [
+  { kind: 'doc', y: 102 },
+  { kind: 'ask', y: 130 },
+  { kind: 'ans', y: 158 },
+];
+
+const rows = lanes.flatMap((l) =>
+  segments.map((s) => ({
+    kind: l.kind,
+    y: l.y,
+    x0: s.x0,
+    x1: s.x1,
+    pitch: s.pitch,
+    dur: s.pitch / SPEED,
+    count: Math.ceil((s.x1 - s.x0) / s.pitch) + 2,
+  })),
+);
+
+const KEEP = { x0: 75.5, x1: 90, pitch: 4.6 };
+const keepRows = [116, 146].map((y) => ({
+  kind: 'keep',
+  y,
+  x0: KEEP.x0,
+  x1: KEEP.x1,
+  pitch: KEEP.pitch,
+  dur: KEEP.pitch / SPEED,
+  count: Math.ceil((KEEP.x1 - KEEP.x0) / KEEP.pitch) + 2,
+}));
+
+// Intake: 12 documents, each with its own tumble, height and lane.
+const INTAKE_X0 = 8;
+const INTAKE_X1 = 31.5;
+const INTAKE_DUR = (INTAKE_X1 - INTAKE_X0) / SPEED;
+const intake = Array.from({ length: 18 }, (_, i) => ({
+  delay: -(i / 18) * INTAKE_DUR,
+  y: 78 + ((i * 29) % 100),
+  lift: 3 + ((i * 17) % 22),
+  spinA: -180 + ((i * 67) % 360),
+  spinB: -140 + ((i * 53) % 280),
+  tumble: 3.4 + ((i * 7) % 9) * 0.28,
+  rest: INTAKE_X0 + ((i * 7) % 23),
+}));
+
+const n = (v: number) => v.toFixed(2);
+---
+
+<section class="mt-8 border-t border-stone-200 pt-7 dark:border-stone-800" aria-labelledby="genie-title">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+        Paper → implementation
+      </p>
+      <h3 id="genie-title" class="mt-2 text-lg font-semibold tracking-tight">
+        Turning documents into evaluation data
+      </h3>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+        Genie provides the data-generation loop. The implementation adapts it to produce
+        source-grounded questions that behave more like the questions people actually ask.
+      </p>
+    </div>
+    <a
+      href="https://arxiv.org/abs/2401.14367"
+      target="_blank"
+      rel="noopener"
+      class="shrink-0 font-mono text-[10px] text-stone-500 hover:text-amber-600 dark:hover:text-amber-400"
+    >
+      Genie · arXiv ↗
+    </a>
+  </div>
+
+  <div class="genie mt-6 overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700" data-genie>
+    <div class="overflow-x-auto">
+      <div class="genie-frame min-w-[720px] px-5 pt-5 sm:px-7 sm:pt-7">
+        <div class="grid grid-cols-4 gap-4" role="tablist" aria-label="Genie pipeline stages">
+          {stages.map((stage, index) => (
+            <button
+              id={`genie-tab-${index}`}
+              type="button"
+              role="tab"
+              aria-selected={index === 0 ? 'true' : 'false'}
+              aria-controls={`genie-panel-${index}`}
+              tabindex={index === 0 ? 0 : -1}
+              data-zone-x={stage.zone[0]}
+              data-zone-w={stage.zone[1] - stage.zone[0]}
+              class="genie-stage rounded-xl px-4 py-3 text-left"
+            >
+              <span class="block font-mono text-xs font-semibold tracking-wide">
+                {stage.number} · {stage.title}
+              </span>
+              <span class="genie-stage-sub mt-1 block font-mono text-[10px]">{stage.subtitle}</span>
+            </button>
+          ))}
+        </div>
+
+        <div
+          class="genie-scene"
+          style={`--zone-x: ${stages[0].zone[0]}%; --zone-w: ${stages[0].zone[1] - stages[0].zone[0]}%`}
+          aria-hidden="true"
+        >
+          <div class="genie-world">
+            <div class="slab-shadow"></div>
+            <div class="slab"></div>
+            <div class="slab-lip"></div>
+
+            <div class="zone"></div>
+
+            <!-- intake: a plain dark cuboid feeding unsorted documents onto the slab -->
+            <div class="solid intake" style="--h: 44px">
+              <div class="f-top"></div>
+              <div class="f-front"></div>
+              <div class="f-side"></div>
+            </div>
+
+            <div class="tumble-field">
+              {intake.map((d) => (
+                <i
+                  class="carrier"
+                  style={`--x0:${n(INTAKE_X0)}%;--x1:${n(INTAKE_X1)}%;--rest:${n(d.rest)}%;--dur:${n(INTAKE_DUR)}s;--delay:${n(d.delay)}s;--y:${d.y}px;--lift:${d.lift}px;--sa:${d.spinA}deg;--sb:${d.spinB}deg;--spin:${n(d.tumble)}s`}
+                >
+                  <b class="tumbler"></b>
+                </i>
+              ))}
+            </div>
+
+            <!-- generator: the gate where unsorted intake becomes ordered lanes -->
+            <div class="gate gate--gen" style="--bx: 31%; --bh: 44px">
+              <i class="gate-wall gate-wall--back"></i>
+              <i class="gate-post gate-post--far"></i>
+              <i class="gate-post gate-post--near"></i>
+              <i class="gate-wall"></i>
+              <i class="gate-cap"></i>
+            </div>
+            <div class="gate-shade" style="--bx: 31%; --w: 124px"></div>
+
+            {rows.map((r) => (
+              <div
+                class={`row row--${r.kind}`}
+                style={`--lane:${r.y}px;--pitch:${n(r.pitch)}%;--dur:${n(r.dur)}s;--m0:${n(r.x0)}%;--m1:${n(r.x1)}%`}
+              >
+                {Array.from({ length: r.count }, (_, i) => (
+                  <span class="chip" style={`left:${n(r.x0 - r.pitch + i * r.pitch)}%`}></span>
+                ))}
+              </div>
+            ))}
+
+            {GATES.map((g) => (
+              <>
+                <div class={`gate gate--${g.id}`} style={`--bx: ${g.x}%; --bh: 38px`}>
+                  <i class="gate-wall gate-wall--back"></i>
+                  <i class="gate-post gate-post--far"></i>
+                  <i class="gate-post gate-post--near"></i>
+                  <i class="gate-wall"></i>
+                  <i class="gate-cap"></i>
+                </div>
+                <div class="gate-shade" style={`--bx: ${g.x}%`}></div>
+              </>
+            ))}
+
+            {keepRows.map((r) => (
+              <div
+                class={`row row--${r.kind}`}
+                style={`--lane:${r.y}px;--pitch:${n(r.pitch)}%;--dur:${n(r.dur)}s;--m0:${n(r.x0)}%;--m1:${n(r.x1)}%`}
+              >
+                {Array.from({ length: r.count }, (_, i) => (
+                  <span class="chip" style={`left:${n(r.x0 - r.pitch + i * r.pitch)}%`}></span>
+                ))}
+              </div>
+            ))}
+
+            <!-- eval rack: an open table with the retained set stacked underneath -->
+            <div class="sheet sheet--a"></div>
+            <div class="sheet sheet--b"></div>
+            <div class="rack">
+              <div class="rack-leg rack-leg--l"></div>
+              <div class="rack-leg rack-leg--r"></div>
+              <div class="rack-apron"></div>
+              <div class="rack-top"></div>
+            </div>
+          </div>
+
+          <!-- labels stay in screen space so the type never shears -->
+          <p class="scene-chip" style="left: 2.5%">unsorted source documents</p>
+          <p class="scene-chip scene-chip--blue" style="left: 33%">100 generated Q&A sets</p>
+          <p class="scene-chip scene-chip--green" style="right: 2.5%">15 retained cases</p>
+
+          {GATES.map((g) => (
+            <p class={`gate-label gate-label--${g.id}`} style={`left: ${g.x}%`}>
+              <span class="dot"></span>
+              {g.label}
+              <b>{g.kept}</b>
+            </p>
+          ))}
+
+          <div class="stream-key">
+            <span class="key-title">stream</span>
+            <span class="key-item key-item--doc">source</span>
+            <span class="key-item key-item--ask">question</span>
+            <span class="key-item key-item--ans">answer</span>
+            <span class="key-item key-item--keep">retained</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="genie-panels p-5 sm:p-6">
+      {stages.map((stage, index) => (
+        <article
+          id={`genie-panel-${index}`}
+          role="tabpanel"
+          aria-labelledby={`genie-tab-${index}`}
+          tabindex="0"
+          hidden={index !== 0}
+          data-genie-panel
+        >
+          <div class="grid gap-5 md:grid-cols-[0.8fr_1.2fr_auto] md:gap-8">
+            <div>
+              <p class="text-xs font-semibold text-stone-500">In the paper</p>
+              <p class="mt-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">{stage.paper}</p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-stone-500">In this implementation</p>
+              <p class="mt-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">{stage.adaptation}</p>
+            </div>
+            <div class="md:min-w-36">
+              <p class="text-xs font-semibold text-stone-500">Output</p>
+              <p class="mt-2 text-sm font-medium text-amber-700 dark:text-amber-400">{stage.output}</p>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+  <p class="mt-3 text-xs leading-relaxed text-stone-500">
+    Select a stage to inspect the handoff. The 100 → 65 → 35 → 15 gate counts illustrate
+    progressive filtering, not reported production metrics; source documents and evaluation data are not shown.
+  </p>
+</section>
+
+<style>
+  /* =====================================================================
+     One ground plane, one grazing camera, matte surfaces. Depth comes from
+     flat fills plus a single darker offset per solid, not from gradients --
+     gradients are what made the earlier version read as plastic.
+     ===================================================================== */
+
+  .genie-frame { background: #ece7dc; }
+  :global(.dark) .genie-frame { background: #16140f; }
+
+  .genie-panels {
+    border-top: 1px solid rgb(120 113 108 / 0.24);
+    background: #f6f3ec;
+  }
+
+  :global(.dark) .genie-panels {
+    border-top-color: rgb(120 113 108 / 0.35);
+    background: rgb(12 10 9 / 0.6);
+  }
+
+  .genie-scene {
+    position: relative;
+    height: 214px;
+    margin: 16px -8px 0;
+    overflow: hidden;
+    /* Nearly orthographic. Strong perspective is what made the belt look like
+       it was falling away from the viewer. */
+    perspective: 2600px;
+    perspective-origin: 50% 50%;
+  }
+
+  .genie-world {
+    position: absolute;
+    inset: 0;
+    transform: rotateX(68deg);
+    transform-origin: 50% 55%;
+    transform-style: preserve-3d;
+  }
+
+  /* --- the slab everything stands on ---------------------------------- */
+
+  .slab {
+    position: absolute;
+    top: 30px;
+    right: 1%;
+    left: 1%;
+    height: 190px;
+    background:
+      linear-gradient(rgb(120 113 108 / 0.12) 1px, transparent 1px) 0 0 / 100% 26px,
+      linear-gradient(90deg, rgb(120 113 108 / 0.12) 1px, transparent 1px) 0 0 / 26px 100%,
+      #cec7b6;
+  }
+
+  .slab-lip {
+    position: absolute;
+    top: 220px;
+    right: 1%;
+    left: 1%;
+    height: 7px;
+    background: #c3bdaf;
+    transform-origin: top center;
+    transform: rotateX(-90deg);
+  }
+
+  .slab-shadow {
+    position: absolute;
+    top: 44px;
+    right: 0.4%;
+    left: 1.6%;
+    height: 196px;
+    background: rgb(74 66 56 / 0.16);
+    filter: blur(7px);
+  }
+
+  :global(.dark) .slab {
+    background:
+      linear-gradient(rgb(214 211 209 / 0.09) 1px, transparent 1px) 0 0 / 100% 26px,
+      linear-gradient(90deg, rgb(214 211 209 / 0.09) 1px, transparent 1px) 0 0 / 26px 100%,
+      #3d372c;
+  }
+
+  :global(.dark) .slab-lip { background: #221e18; }
+  :global(.dark) .slab-shadow { background: rgb(0 0 0 / 0.4); }
+
+  /* --- solids: flat faces, no highlights ------------------------------- */
+
+  .solid { position: absolute; transform-style: preserve-3d; }
+
+  .f-top,
+  .f-front,
+  .f-side { position: absolute; }
+
+  .f-top {
+    inset: 0;
+    background: #3b3730;
+    transform: translateZ(var(--h));
+  }
+
+  .f-front {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--h);
+    background: #23201b;
+    transform-origin: bottom center;
+    transform: rotateX(-90deg);
+  }
+
+  /* rotateY maps the element's own X onto the scene's Z, which is what turns a
+     flat rect into a vertical face without any hand-tuned skew. */
+  .f-side {
+    top: 0;
+    right: 0;
+    width: var(--h);
+    height: 100%;
+    background: #2c2822;
+    transform-origin: right center;
+    transform: rotateY(90deg);
+  }
+
+  :global(.dark) .f-top { background: #4c463b; }
+  :global(.dark) .f-front { background: #0f0d0b; }
+  :global(.dark) .f-side { background: #1c1915; }
+
+  .intake {
+    top: 66px;
+    left: 2%;
+    width: 7.5%;
+    height: 128px;
+  }
+
+  /* --- gates ----------------------------------------------------------- */
+
+  /* A gate straddling the lanes: one leg on the far edge of the belt, one on
+     the near edge, beam across the top. The wrapper's rotateZ swings the base
+     line within the ground plane -- it sits 93 degrees counter-clockwise from
+     the plane's +x axis, which is a *negative* CSS rotateZ because the plane's
+     own y runs toward the camera.
+
+     Three degrees off square means the frame is nearly edge-on, and a flat
+     wall at that angle keeps about six pixels of screen width -- a hairline.
+     So the gate is a real extrusion: --pt of thickness along the belt. Depth
+     projects onto screen x at full scale here, so it is the swept faces, not
+     the wall, that carry the gate's width on screen. In the gate's own frame
+     -x is the near side of the belt, which is why both legs show their -x
+     face and the beam shows its top. */
+  .gate {
+    --w: 112px;
+    --pt: 12px;
+
+    position: absolute;
+    bottom: 84px;
+    left: var(--bx);
+    width: 0;
+    height: 0;
+    margin-left: calc(var(--pt) / -2);
+    transform-origin: 50% 50%;
+    transform: rotateZ(-93deg);
+    transform-style: preserve-3d;
+  }
+
+  .gate > * { position: absolute; background-color: var(--gc); }
+
+  /* front and back of the extrusion. Grazing from this camera, so these carry
+     the silhouette and the doorway edges rather than any real area. */
+  .gate-wall {
+    bottom: 0;
+    left: calc(var(--w) / -2);
+    width: var(--w);
+    height: var(--bh);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 80% 100%, 80% 18%, 20% 18%, 20% 100%, 0 100%);
+    transform-origin: bottom center;
+    transform: rotateX(-90deg);
+  }
+
+  .gate-wall--back {
+    background-image: linear-gradient(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.22));
+    transform: translateY(var(--pt)) rotateX(-90deg);
+  }
+
+  /* rotateY maps the element's own X onto the scene's Z, so a flat rect stands
+     up as a vertical face -- the same trick as .f-side, mirrored to the left
+     edge so the face points at the camera instead of away from it. */
+  .gate-post {
+    top: 0;
+    width: var(--bh);
+    height: var(--pt);
+    background-image: linear-gradient(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.14));
+    transform-origin: left center;
+    transform: rotateY(-90deg);
+  }
+
+  .gate-post--near { left: calc(var(--w) / -2); }
+  .gate-post--far { left: calc(var(--w) * 0.3); }
+
+  /* Top of the beam. At this angle it is the largest surface pointed anywhere
+     near the camera, so it is the band that actually reads as the gate. */
+  .gate-cap {
+    top: 0;
+    left: calc(var(--w) / -2);
+    width: var(--w);
+    height: var(--pt);
+    background-image: linear-gradient(rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.2));
+    transform: translateZ(var(--bh));
+  }
+
+  .gate--gen { --gc: #2b2721; --w: 124px; }
+  .gate--grounded { --gc: #c2566b; }
+  .gate--intent { --gc: #cf9036; }
+  .gate--utility { --gc: #58ab86; }
+
+  :global(.dark) .gate--gen { --gc: #a9a193; }
+  :global(.dark) .gate--grounded { --gc: #d97286; }
+  :global(.dark) .gate--intent { --gc: #e0a552; }
+  :global(.dark) .gate--utility { --gc: #6bc79c; }
+
+  .gate-shade {
+    position: absolute;
+    bottom: 71px;
+    left: var(--bx);
+    width: var(--w, 112px);
+    height: 16px;
+    margin-left: -53px;
+    background: linear-gradient(
+      90deg,
+      rgb(74 66 56 / 0.2) 0 20%,
+      transparent 20% 80%,
+      rgb(74 66 56 / 0.2) 80% 100%
+    );
+    filter: blur(4px);
+    transform: rotateZ(-93deg);
+  }
+
+  :global(.dark) .gate-shade { background: rgb(0 0 0 / 0.35); }
+
+  /* --- unsorted intake -------------------------------------------------- */
+
+  .tumble-field {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .carrier {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 0;
+    animation: run var(--dur) linear var(--delay) infinite;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  @keyframes run {
+    from { transform: translate3d(var(--x0), 0, 0); }
+    to { transform: translate3d(var(--x1), 0, 0); }
+  }
+
+  /* Stays flat on the slab while the page above it tumbles, which is the only
+     thing keeping the intake from looking like it floats. */
+  .carrier::after {
+    position: absolute;
+    top: var(--y);
+    left: -9px;
+    width: 19px;
+    height: 21px;
+    margin-top: -10px;
+    border-radius: 50%;
+    background: rgb(74 66 56 / 0.22);
+    content: '';
+    filter: blur(3px);
+    animation: fade var(--dur) linear var(--delay) infinite;
+  }
+
+  :global(.dark) .carrier::after { background: rgb(0 0 0 / 0.45); }
+
+  .tumbler {
+    position: absolute;
+    top: var(--y);
+    left: -7px;
+    display: block;
+    width: 14px;
+    height: 17px;
+    margin-top: -8px;
+    border-radius: 1px;
+    background: #f7f5ef;
+    box-shadow: 0 2px 0 #cfc9bc;
+    animation:
+      tumble var(--spin) linear infinite,
+      fade var(--dur) linear var(--delay) infinite;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+  }
+
+  @keyframes tumble {
+    from { transform: translateZ(var(--lift)) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    to { transform: translateZ(var(--lift)) rotateX(360deg) rotateY(var(--sa)) rotateZ(var(--sb)); }
+  }
+
+  @keyframes fade {
+    0%, 100% { opacity: 0; }
+    12%, 88% { opacity: 1; }
+  }
+
+  /* --- ordered lanes ----------------------------------------------------
+     One animation per lane. The row holds one extra chip at each end and
+     travels exactly one pitch, so the loop is seamless and the whole row
+     costs a single composited layer.
+     -------------------------------------------------------------------- */
+
+  .row {
+    position: absolute;
+    inset: 0;
+    animation: march var(--dur) linear infinite;
+    mask-image: linear-gradient(90deg, transparent var(--m0), #000 var(--m0), #000 var(--m1), transparent var(--m1));
+    -webkit-mask-image: linear-gradient(90deg, transparent var(--m0), #000 var(--m0), #000 var(--m1), transparent var(--m1));
+    will-change: transform;
+  }
+
+  @keyframes march {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(var(--pitch), 0, 0); }
+  }
+
+  .chip {
+    position: absolute;
+    top: var(--lane);
+    display: block;
+    width: 15px;
+    height: 10px;
+    margin: -5px 0 0 -7.5px;
+    border-radius: 1.5px;
+  }
+
+  /* The solid offset is the chip's front face; the blurred one is its shadow. */
+  .row--doc .chip { background: #fdfcf8; box-shadow: 0 3px 0 #c6bfae, 3px 7px 6px rgb(74 66 56 / 0.26); }
+  .row--ask .chip { background: #7fb0e2; box-shadow: 0 3px 0 #4f80b4, 3px 6px 5px rgb(74 66 56 / 0.16); }
+  .row--ans .chip { background: #efb75f; box-shadow: 0 3px 0 #b9862f, 3px 6px 5px rgb(74 66 56 / 0.16); }
+  .row--keep .chip {
+    width: 17px;
+    height: 12px;
+    margin: -6px 0 0 -8.5px;
+    background: #79d3ab;
+    box-shadow: 0 4px 0 #3f9c76, 3px 7px 6px rgb(74 66 56 / 0.18);
+  }
+
+  /* --- eval rack: open table, retained set stacked underneath ----------- */
+
+  .sheet {
+    position: absolute;
+    width: 3.4%;
+    height: 34px;
+    border-radius: 1px;
+    background: #f7f5ef;
+    box-shadow:
+      0 2px 0 #d7d2c6,
+      0 -3px 0 -1px #f7f5ef,
+      0 -6px 0 -2px #e8e4da;
+  }
+
+  .sheet--a { top: 96px; left: 87.5%; }
+  .sheet--b { top: 140px; left: 91.5%; }
+
+  :global(.dark) .sheet {
+    background: #cfcabd;
+    box-shadow: 0 2px 0 #8d8778, 0 -3px 0 -1px #cfcabd, 0 -6px 0 -2px #b3ada0;
+  }
+
+  .rack {
+    position: absolute;
+    top: 74px;
+    right: 1.5%;
+    width: 12%;
+    height: 116px;
+    transform-style: preserve-3d;
+  }
+
+  .rack-top {
+    position: absolute;
+    inset: 0;
+    background: #3b3730;
+    transform: translateZ(42px);
+  }
+
+  .rack-apron {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 11px;
+    background: #23201b;
+    transform-origin: bottom center;
+    transform: translateZ(31px) rotateX(-90deg);
+  }
+
+  .rack-leg {
+    position: absolute;
+    bottom: 0;
+    width: 12px;
+    height: 42px;
+    background: #262219;
+    transform-origin: bottom center;
+    transform: rotateX(-90deg);
+  }
+
+  .rack-leg--l { left: 0; }
+  .rack-leg--r { right: 0; }
+
+  :global(.dark) .rack-top { background: #4c463b; }
+  :global(.dark) .rack-apron { background: #0f0d0b; }
+  :global(.dark) .rack-leg { background: #14110e; }
+
+  /* --- active stage ------------------------------------------------------ */
+
+  .zone {
+    position: absolute;
+    top: 62px;
+    left: var(--zone-x);
+    width: var(--zone-w);
+    height: 140px;
+    border: 1.5px solid rgb(196 128 24 / 0.8);
+    border-radius: 5px;
+    background: rgb(232 168 60 / 0.07);
+    transition:
+      left 0.55s cubic-bezier(0.32, 0.72, 0, 1),
+      width 0.55s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  :global(.dark) .zone {
+    border-color: rgb(251 191 36 / 0.35);
+    background: rgb(251 191 36 / 0.1);
+  }
+
+  /* --- screen-space overlays -------------------------------------------- */
+
+  .scene-chip,
+  .gate-label,
+  .stream-key {
+    position: absolute;
+    z-index: 5;
+    border-radius: 0.4rem;
+    background: rgb(43 39 33 / 0.92);
+    color: #ece7dc;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .scene-chip {
+    top: 2px;
+    padding: 0.3rem 0.45rem;
+  }
+
+  .scene-chip--blue { color: #a9cdf2; }
+  .scene-chip--green { color: #9ce3c4; }
+
+  .gate-label {
+    top: 22px;
+    display: grid;
+    justify-items: center;
+    gap: 0.22rem;
+    padding: 0.3rem 0.42rem;
+    text-align: center;
+    transform: translateX(-50%);
+  }
+
+  .gate-label b { display: block; font-weight: 700; }
+
+  .dot { width: 5px; height: 5px; border-radius: 999px; }
+  .gate-label--grounded .dot { background: #e07d90; }
+  .gate-label--intent .dot { background: #efb75f; }
+  .gate-label--utility .dot { background: #79d3ab; }
+
+  .stream-key {
+    bottom: 2px;
+    left: 2.5%;
+    display: flex;
+    gap: 0.55rem;
+    padding: 0.32rem 0.5rem;
+    color: #a8a29e;
+  }
+
+  .key-title { letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .key-item { display: flex; align-items: center; gap: 0.25rem; color: #ece7dc; }
+
+  .key-item::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    content: '';
+  }
+
+  .key-item--doc::before { background: #f7f5ef; }
+  .key-item--ask::before { background: #7fb0e2; }
+  .key-item--ans::before { background: #efb75f; }
+  .key-item--keep::before { background: #79d3ab; }
+
+  /* --- tabs -------------------------------------------------------------- */
+
+  .genie-stage {
+    background: rgb(43 39 33 / 0.9);
+    color: #ece7dc;
+    transition:
+      background 0.3s ease,
+      box-shadow 0.3s ease,
+      transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .genie-stage-sub { color: #a8a29e; }
+
+  .genie-stage:hover { background: rgb(43 39 33 / 1); transform: translateY(-1px); }
+
+  .genie-stage[aria-selected='true'] {
+    background: #23201b;
+    box-shadow: 0 0 0 2px rgb(226 154 39 / 0.75);
+  }
+
+  [data-genie-panel]:not([hidden]) {
+    animation: reveal 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carrier,
+    .carrier::after,
+    .tumbler,
+    .row,
+    [data-genie-panel]:not([hidden]) {
+      animation: none;
+    }
+
+    .carrier::after { opacity: 1; }
+
+    .carrier { transform: translate3d(var(--rest), 0, 0); }
+    .tumbler { opacity: 0.95; transform: translateZ(var(--lift)) rotateZ(var(--sb)); }
+    .zone { transition: none; }
+  }
+</style>
+
+<script>
+  for (const pipeline of document.querySelectorAll<HTMLElement>('[data-genie]')) {
+    const tabs = [...pipeline.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...pipeline.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const scene = pipeline.querySelector<HTMLElement>('.genie-scene');
+
+    const activate = (nextIndex: number, moveFocus = false) => {
+      const tab = tabs[nextIndex];
+
+      // The highlight tracks the stage's own span of the slab, so the tabs and
+      // the scene always describe the same thing.
+      scene?.style.setProperty('--zone-x', `${tab.dataset.zoneX}%`);
+      scene?.style.setProperty('--zone-w', `${tab.dataset.zoneW}%`);
+
+      tabs.forEach((candidate, index) => {
+        const selected = index === nextIndex;
+        candidate.setAttribute('aria-selected', String(selected));
+        candidate.tabIndex = selected ? 0 : -1;
+        panels[index].hidden = !selected;
+      });
+
+      if (moveFocus) tab.focus();
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activate(index));
+      tab.addEventListener('keydown', (event) => {
+        let nextIndex = index;
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          nextIndex = (index + 1) % tabs.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          nextIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (event.key === 'Home') {
+          nextIndex = 0;
+        } else if (event.key === 'End') {
+          nextIndex = tabs.length - 1;
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+        activate(nextIndex, true);
+      });
+    });
+  }
+</script>

@@ -9,9 +9,9 @@ const roles = [
     location: 'Remote, India',
     current: true,
     bullets: [
-      'Shipped an Intelligent Document Processing pipeline converting engineering PDFs to schema-constrained JSON: benchmarked open-source VLMs, paired LightOnOCR2 with a prompt-engineered LLM stage, and closed the loop with a verification database that learns from human corrections. Reached 2.1 pages per second, 80% extraction accuracy across handwritten, low-resolution, and complex-layout documents, 100% schema validity, and roughly a 10× reduction in review time.',
+      'Shipped an Intelligent Document Processing pipeline converting engineering PDFs to schema-constrained JSON: benchmarked open-source VLMs, paired LightOnOCR2 with a prompt-engineered LLM stage, and closed the loop with a verification database that learns from human corrections. On a held-out set of 100 handwritten, low-resolution, and complex-layout documents, field-level extraction accuracy went from 32% with the previous LLM-based pipeline to 80%, at 2.1 pages per second on an L40S with 100% schema validity.',
       'Built the team’s LLM eval harness: automated grading, adversarial probing, and red-teaming with Promptfoo, Garak, and DeepEval, plus a custom BinEval implementation that decomposes failing runs into specific failure modes. Adapted Genie into a synthetic document Q&A generation pipeline tuned for human-like questions.',
-      'Trained a custom LiDAR segmentation architecture based on RandLA-Net and KPConvNeXt on approximately 3 million labeled points spanning transmission towers and conductors. On held-out validation data, reached 92% minority-class IoU and 98% majority-class IoU, with 98% overall accuracy. Used minority-class focused sampling, focal loss, and class-balanced re-weighting; cut training and preprocessing time through caching and batched I/O; and mentored an intern through the project.',
+      'Trained a custom LiDAR segmentation architecture based on RandLA-Net and KPConvNeXt on approximately 3 million labeled points spanning transmission towers and conductors. On held-out validation data, the operationally important minority class reached 92% IoU against 98% IoU on the majority class — the metric that matters on a point cloud where overall accuracy is close to the majority-class baseline. Used minority-class focused sampling, focal loss, and class-balanced re-weighting; cut training and preprocessing time through caching and batched I/O; and mentored an intern through the project.',
       'Designed LLM evaluation frameworks that turn sprint outputs, PRs, and design docs into measurable signals for team feedback loops and leadership visibility.',
       'Running production LLM inference on vLLM tuned to real traffic patterns; researching quantization, speculative decoding, and serving topologies across vLLM, SGLang, and llama.cpp.',
     ],
@@ -23,7 +23,7 @@ const roles = [
     location: 'Remote, USA',
     current: false,
     bullets: [
-      'Designed a robust pipeline to filter human-containing images and perform accurate object detection in utility environments. Improved model accuracy by 15% and reduced annotation time by 20% via a custom Label Studio workflow.',
+      'Designed a robust pipeline to filter human-containing images and perform accurate object detection in utility environments. Improved detection accuracy by 15 percentage points and cut annotation time by 20% via a custom Label Studio workflow.',
       'Built a full SfM pipeline using COLMAP and OpenSFM to generate high-fidelity 3D meshes from 500+ high-resolution indoor images, completing reconstruction in under 6 hours.',
       'Integrated Gaussian Splatting and 2DGS techniques into the SfM pipeline enabling real-time (30 FPS) photo-realistic rendering. On comparable scenes, achieved an 80% speed improvement using a GLOMAP-based architecture, reducing processing time to under 60 minutes for complex scenes. Dockerized the full pipeline for scalable deployment.',
       'Created a custom font library using FontForge and generated 15,000+ synthetic images. Trained an OCR model capable of recognizing technical symbols and custom fonts across engineering documents.',
@@ -48,20 +48,23 @@ const roles = [
   },
 ];
 ---
-<Layout title="Experience — Param Dave">
-  <section class="mx-auto max-w-3xl px-6 pt-20 pb-12">
-    <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Experience</h1>
-    <p class="mt-4 text-neutral-600 dark:text-neutral-400">
+<Layout
+  title="Experience — Param Dave"
+  description="Role-by-role record: LLM evaluation and document intelligence at TRC Inc, computer vision and 3D reconstruction, and depth-estimation research at B Garage."
+>
+  <section class="mx-auto max-w-3xl px-6 pt-14 pb-9">
+    <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Experience</h1>
+    <p class="mt-4 text-stone-600 dark:text-stone-400">
       Where I've shipped things that ended up in front of real users.
     </p>
   </section>
 
-  <section class="mx-auto max-w-3xl px-6 pb-16">
+  <section class="mx-auto max-w-3xl px-6 pb-12">
     <div class="space-y-12">
       {roles.map((role) => (
-        <article class="border-l-2 border-neutral-200 pl-6 dark:border-neutral-800">
+        <article class="border-l-2 border-stone-200 pl-6 dark:border-stone-800">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 class="text-lg font-semibold">
+            <h2 class="text-base font-semibold">
               {role.title} · <span class="text-amber-600 dark:text-amber-400">{role.company}</span>
             </h2>
             <div class="flex items-center gap-2">
@@ -70,11 +73,11 @@ const roles = [
                   current
                 </span>
               )}
-              <span class="font-mono text-xs text-neutral-500">{role.period}</span>
+              <span class="font-mono text-xs text-stone-500">{role.period}</span>
             </div>
           </div>
-          <p class="mt-1 text-sm text-neutral-500">{role.location}</p>
-          <ul class="mt-4 space-y-3 text-neutral-700 dark:text-neutral-300">
+          <p class="mt-1 text-sm text-stone-500">{role.location}</p>
+          <ul class="mt-4 space-y-3 text-stone-700 dark:text-stone-300">
             {role.bullets.map((b) => (
               <li class="flex gap-3">
                 <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-amber-500"></span>

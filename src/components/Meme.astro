@@ -1,0 +1,56 @@
+---
+// Compact aside for the joke images. Keeps them at a fixed narrow column so a
+// meme reads as a margin note next to the argument, never as the argument.
+interface Props {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  /** Image column width. Widen it when the joke is lettered into the image
+   *  itself — below roughly 240px that text stops being readable. */
+  imgWidth?: string;
+  tone?: 'light' | 'dark';
+  eager?: boolean;
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  imgWidth = '270px',
+  tone = 'light',
+  eager = false,
+  class: className = '',
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<figure
+  style={`--meme-img: ${imgWidth}`}
+  class:list={[
+    'grid max-w-[calc(var(--meme-img)+20rem)] overflow-hidden rounded-xl border',
+    'sm:grid-cols-[var(--meme-img)_1fr] sm:items-center',
+    tone === 'dark'
+      ? 'border-stone-800 bg-stone-950 text-white'
+      : 'border-stone-200 bg-stone-50 dark:border-stone-800 dark:bg-stone-900/60',
+    className,
+  ]}
+>
+  <div class="@container relative mx-auto w-full max-w-[var(--meme-img)] overflow-hidden bg-white sm:max-w-none dark:bg-stone-900">
+    <img
+      src={`${base}/img/${src}`}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={eager ? undefined : 'lazy'}
+      decoding="async"
+      class="block h-auto w-full"
+    />
+    <slot name="overlay" />
+  </div>
+  <figcaption class="p-4 sm:p-5">
+    <slot />
+  </figcaption>
+</figure>

@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { github, linkedin } from '../data/site';
 
 interface Props {
   title?: string;
@@ -17,6 +18,32 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const siteUrl = Astro.site ? Astro.site.toString().replace(/\/$/, '') : '';
 const ogImage = `${siteUrl}${base}/og.png`;
 const canonicalUrl = `${siteUrl}${base}${Astro.url.pathname.replace(base, '') || '/'}`;
+
+// Declared here rather than in global.css so the font URL picks up the base path.
+const fontFace = `@font-face{font-family:'Caveat Note';src:url('${base}/fonts/caveat-note.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap;}`;
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Param Dave',
+  url: `${siteUrl}${base}/`,
+  image: ogImage,
+  jobTitle: 'Senior Machine Learning Engineer',
+  worksFor: { '@type': 'Organization', name: 'TRC Inc' },
+  alumniOf: [
+    { '@type': 'CollegeOrUniversity', name: 'University of Maryland, College Park' },
+    { '@type': 'CollegeOrUniversity', name: 'Nirma University' },
+  ],
+  knowsAbout: [
+    'Machine learning engineering',
+    'LLM evaluation',
+    'Agentic systems',
+    '3D perception',
+    'Computer vision',
+    'Robotics',
+  ],
+  sameAs: [github, linkedin],
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -26,6 +53,8 @@ const canonicalUrl = `${siteUrl}${base}${Astro.url.pathname.replace(base, '') ||
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
@@ -43,6 +72,9 @@ const canonicalUrl = `${siteUrl}${base}${Astro.url.pathname.replace(base, '') ||
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
+    <style is:inline set:html={fontFace}></style>
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema)}></script>
+
     <script is:inline>
       const stored = localStorage.getItem('theme');
       if (stored === 'dark') {
@@ -51,17 +83,40 @@ const canonicalUrl = `${siteUrl}${base}${Astro.url.pathname.replace(base, '') ||
     </script>
   </head>
   <body class="min-h-screen flex flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-stone-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white dark:focus:bg-amber-400 dark:focus:text-stone-900"
+    >
+      Skip to content
+    </a>
     <Nav />
-    <main class="flex-1">
+    <main id="main" class="flex-1">
       <slot />
     </main>
     <Footer />
     <script is:inline>
       const btn = document.getElementById('theme-toggle');
+      btn?.setAttribute('aria-pressed', String(document.documentElement.classList.contains('dark')));
       btn?.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        btn.setAttribute('aria-pressed', String(isDark));
       });
+
+      console.log(
+        '%cyou opened devtools. respect.',
+        'font: 600 13px ui-monospace, monospace; color:#d97706',
+      );
+      console.log('source: https://github.com/ParamDave5 · or just email me: param10.dave@gmail.com');
+
+      // Looping clips are decorative; hold them on the poster frame if the
+      // visitor has asked for reduced motion.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        for (const video of document.querySelectorAll('video[autoplay]')) {
+          video.removeAttribute('autoplay');
+          video.pause();
+        }
+      }
     </script>
   </body>
 </html>

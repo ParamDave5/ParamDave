@@ -1,0 +1,234 @@
+---
+const stages = [
+  {
+    number: '01',
+    title: 'Frame the outcome',
+    short: 'Define success before selecting a model.',
+    question: 'What should become measurably better for the user or the business?',
+    output: 'Success criteria and constraints',
+    decision: 'Optimize for the outcome, not the most interesting technique.',
+    example:
+      'For document intelligence, better OCR was not enough. The target was 100% decision accuracy: when the system compared outputs, it had to identify the correct one and reject the incorrect one, with no ambiguous result.',
+  },
+  {
+    number: '02',
+    title: 'Reason from first principles',
+    short: 'Separate facts from inherited assumptions.',
+    question: 'Which constraints are real, and which beliefs are merely carried over?',
+    output: 'Fact, assumption, and constraint map',
+    decision: 'Keep only the assumptions that survive contact with evidence.',
+    example:
+      'Handwriting, scan quality, layout, domain symbols, and schema rules became separate system constraints instead of one vague model problem.',
+  },
+  {
+    number: '03',
+    title: 'Investigate uncertainty',
+    short: 'Run the smallest test that changes the decision.',
+    question: 'What evidence would tell us which approach is worth building?',
+    output: 'Experiment or research plan',
+    decision: 'Test the riskiest unknown before scaling the implementation.',
+    example:
+      'I benchmarked vision-language models, decomposed failure modes, and tested where OCR, generation, and verification each belonged.',
+  },
+  {
+    number: '04',
+    title: 'Ship and learn',
+    short: 'Let production behavior refine the system.',
+    question: 'What does real use reveal that the benchmark could not?',
+    output: 'Production signal and next iteration',
+    decision: 'Turn anomalies and corrections into the next evaluation set.',
+    example:
+      'Human corrections feed the verification database, while production failures become reproducible cases for the evaluation harness.',
+  },
+];
+---
+
+<section class="border-t border-stone-200 dark:border-stone-800" aria-labelledby="workflow-title">
+  <div class="mx-auto max-w-5xl px-6 py-11">
+    <div class="grid gap-5 md:grid-cols-[0.7fr_1.3fr] md:items-end md:gap-14">
+      <div>
+        <p class="text-xs font-semibold text-stone-500">How I work</p>
+        <h2 id="workflow-title" class="mt-2 text-xl font-semibold tracking-tight">
+          Start with the outcome, then reason from first principles.
+        </h2>
+      </div>
+      <p class="text-stone-600 dark:text-stone-400">
+        I move from an outcome to the uncertainty blocking it, test what matters, and use
+        production evidence to decide what the next iteration should be.
+      </p>
+    </div>
+
+    <div
+      class="mt-8 overflow-hidden rounded-xl border border-stone-200 bg-stone-50/70 p-4 sm:p-6 dark:border-stone-800 dark:bg-stone-900/40"
+      data-workflow
+    >
+      <div class="relative" role="tablist" aria-label="Workflow stages">
+        <span
+          class="absolute top-7 bottom-7 left-[1.3rem] w-px bg-stone-300 sm:top-[1.3rem] sm:right-[10%] sm:bottom-auto sm:left-[10%] sm:h-px sm:w-auto dark:bg-stone-700"
+          aria-hidden="true"
+        ></span>
+        <div class="relative grid gap-1 sm:grid-cols-4 sm:gap-3">
+          {stages.map((stage, index) => (
+            <button
+              id={`workflow-tab-${index}`}
+              type="button"
+              role="tab"
+              aria-selected={index === 0 ? 'true' : 'false'}
+              aria-controls={`workflow-panel-${index}`}
+              tabindex={index === 0 ? 0 : -1}
+              class="workflow-tab group grid min-h-14 grid-cols-[2.75rem_1fr] items-center gap-3 py-2 text-left sm:flex sm:min-h-0 sm:flex-col sm:items-center sm:gap-2 sm:px-2 sm:text-center"
+            >
+              <span class="workflow-node relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-stone-300 bg-white font-mono text-[11px] font-semibold text-stone-600 transition-all dark:border-stone-700 dark:bg-stone-950 dark:text-stone-400">
+                {stage.number}
+              </span>
+              <span>
+                <span class="workflow-label block text-sm font-semibold">{stage.title}</span>
+                <span class="mt-0.5 hidden text-xs leading-snug text-stone-500 lg:block">
+                  {stage.short}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-6 border-t border-stone-200 pt-6 dark:border-stone-800">
+        {stages.map((stage, index) => (
+          <article
+            id={`workflow-panel-${index}`}
+            role="tabpanel"
+            aria-labelledby={`workflow-tab-${index}`}
+            tabindex="0"
+            hidden={index !== 0}
+            data-workflow-panel
+          >
+            <div class="grid gap-6 md:grid-cols-[1.1fr_0.9fr] md:gap-10">
+              <div>
+                <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                  {stage.number} / Guiding question
+                </p>
+                <h3 class="mt-2 max-w-2xl text-lg font-semibold leading-snug">
+                  {stage.question}
+                </h3>
+                <div class="mt-5 rounded-lg border-l-2 border-amber-500 bg-white p-4 dark:bg-stone-950/70">
+                  <p class="text-xs font-semibold text-stone-500">In practice</p>
+                  <p class="mt-2 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                    {stage.example}
+                  </p>
+                </div>
+              </div>
+
+              <dl class="grid content-start gap-5 sm:grid-cols-2 md:grid-cols-1">
+                <div>
+                  <dt class="text-xs font-semibold text-stone-500">Output</dt>
+                  <dd class="mt-1 text-sm font-medium">{stage.output}</dd>
+                </div>
+                <div>
+                  <dt class="text-xs font-semibold text-stone-500">Decision rule</dt>
+                  <dd class="mt-1 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                    {stage.decision}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-6 flex items-start gap-3 rounded-lg border border-dashed border-stone-300 px-4 py-3 dark:border-stone-700">
+        <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M20 7h-8a6 6 0 0 0-6 6v4" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="m17 4 3 3-3 3M3 14l3 3 3-3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <p class="text-xs leading-relaxed text-stone-600 dark:text-stone-400">
+          Production evidence loops back into the next outcome. This is a cycle, not a handoff.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .workflow-tab[aria-selected='true'] .workflow-node {
+    border-color: #d97706;
+    background: #d97706;
+    color: white;
+    box-shadow: 0 0 0 4px rgb(217 119 6 / 0.12);
+  }
+
+  .workflow-tab[aria-selected='true'] .workflow-label {
+    color: #b45309;
+  }
+
+  :global(.dark) .workflow-tab[aria-selected='true'] .workflow-node {
+    border-color: #fbbf24;
+    background: #fbbf24;
+    color: #1c1917;
+    box-shadow: 0 0 0 4px rgb(251 191 36 / 0.12);
+  }
+
+  :global(.dark) .workflow-tab[aria-selected='true'] .workflow-label {
+    color: #fbbf24;
+  }
+
+  [data-workflow-panel]:not([hidden]) {
+    animation: workflow-reveal 180ms ease-out;
+  }
+
+  @keyframes workflow-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-workflow-panel]:not([hidden]) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  for (const workflow of document.querySelectorAll<HTMLElement>('[data-workflow]')) {
+    const tabs = [...workflow.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...workflow.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+
+    const activate = (nextIndex: number, moveFocus = false) => {
+      tabs.forEach((tab, index) => {
+        const selected = index === nextIndex;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        panels[index].hidden = !selected;
+      });
+
+      if (moveFocus) tabs[nextIndex].focus();
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activate(index));
+      tab.addEventListener('keydown', (event) => {
+        let nextIndex = index;
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          nextIndex = (index + 1) % tabs.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          nextIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (event.key === 'Home') {
+          nextIndex = 0;
+        } else if (event.key === 'End') {
+          nextIndex = tabs.length - 1;
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+        activate(nextIndex, true);
+      });
+    });
+  }
+</script>

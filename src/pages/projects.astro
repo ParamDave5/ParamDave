@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Meme from '../components/Meme.astro';
+import GeniePipeline from '../components/GeniePipeline.astro';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 type CaseStudy = {
@@ -10,6 +12,7 @@ type CaseStudy = {
   question: string;
   context: string;
   approach: string[];
+  deadEnd?: { approach: string; why: string };
   outcome: string;
   evidence: string[];
   stack: string[];
@@ -19,22 +22,47 @@ type CaseStudy = {
 const caseStudies: CaseStudy[] = [
   {
     id: 'reliable-agents',
-    area: 'LLM systems',
+    area: 'Agent evaluation',
     title: 'Making agent failures diagnosable',
     period: '2025 – Present',
     question:
       'How do you tell whether an agent failed at perception, generation, evaluation, or verification?',
     context:
-      'The document mix included handwriting, low-resolution scans, complex layouts, and domain-specific symbols. Outputs also had to conform to a downstream schema, so a plausible answer was not enough when silent errors could propagate through the workflow.',
+      'Aggregate scores could show that an agent failed, but not which component or behavior caused the failure. The evaluation system needed to catch weaknesses before release and turn failures observed in production into specific, actionable diagnoses.',
     approach: [
-      'Benchmarked open-source vision-language models and paired LightOnOCR2 with a prompt-engineered LLM stage.',
       'Built automated grading, adversarial probing, and red-teaming workflows with Promptfoo, Garak, and DeepEval.',
-      'Implemented BinEval-style failure decomposition and a verification database that learns from human corrections.',
+      'Implemented a custom BinEval-style decomposition that separates perception, generation, evaluation, and verification failures.',
+      'Adapted Genie into a synthetic document Q&A pipeline tuned to generate questions that resemble real user intent.',
     ],
     outcome:
-      'Shipped an intelligent document processing pipeline that runs at 2.1 pages per second, reaches 80% extraction accuracy across the difficult document mix, produces schema-valid output on 100% of evaluated runs, and reduces human review time by roughly 10×.',
-    evidence: ['2.1 pages / second', '80% extraction accuracy', '100% schema validity', '~10× less review time'],
-    stack: ['LightOnOCR2', 'Promptfoo', 'Garak', 'DeepEval', 'BinEval', 'vLLM'],
+      'Built the team’s evaluation harness for pre-production quality gates and post-production diagnosis, making failed runs easier to reproduce, classify, and route toward the right system improvement.',
+    evidence: ['Pre-production quality gates', 'Post-production diagnosis', 'Failure-mode decomposition', 'Human-like synthetic Q&A'],
+    stack: ['Promptfoo', 'Garak', 'DeepEval', 'BinEval', 'Genie', 'Arize Phoenix', 'Sonar Cube'],
+  },
+  {
+    id: 'document-intelligence',
+    area: 'Document intelligence',
+    title: 'Turning difficult documents into reliable structured data',
+    period: '2025 – 2026',
+    question:
+      'How do you extract schema-constrained data from difficult engineering documents without allowing silent errors to propagate?',
+    context:
+      'The document mix included handwriting, low-resolution scans, complex layouts, and domain-specific symbols. Outputs also had to conform to a downstream schema, so a plausible answer wasn\'t enough when silent errors could propagate through the workflow.',
+    approach: [
+      'Benchmarked open-source vision-language models and paired LightOnOCR2 with a prompt-engineered LLM stage.',
+      'Produced schema-constrained JSON with validation designed around the downstream application workflow.',
+      'Built a verification database that captures human corrections and feeds them back into the extraction loop.',
+    ],
+    deadEnd: {
+      approach:
+        'The pipeline started as a single multimodal LLM: PDF in, structured output out, one pass.',
+      why:
+        'It reached 32% field-level accuracy, and the number was the smaller problem. Reading and extraction happened in the same pass, so a wrong field could mean the model misread the handwriting, or read it correctly and assigned it to the wrong key — with no way to tell which. It also failed quietly, returning fluent, schema-shaped, confidently wrong values. Splitting the stages apart, OCR first and then a constrained LLM, made every failure attributable to one of them. That is what turned an accuracy problem into a fixable one.',
+    },
+    outcome:
+      'On a held-out set of 100 documents spanning handwriting, low-resolution scans, and complex layouts, field-level extraction accuracy went from 32% with the previous LLM-based pipeline to 80%, at 2.1 pages per second on an L40S with schema-valid JSON on 100% of runs. The verification database changed the reviewer’s job from transcribing fields to correcting them.',
+    evidence: ['32% → 80% field-level accuracy', '100 held-out documents', '2.1 pages / sec on an L40S', '100% schema validity'],
+    stack: ['LightOnOCR2', 'vLLM', 'llama.cpp' ,'Schema-constrained JSON', 'Verification database'],
   },
   {
     id: 'lidar-segmentation',
@@ -51,8 +79,10 @@ const caseStudies: CaseStudy[] = [
       'Improved the training, preprocessing, and annotation loops through caching, batched I/O, and a redesigned labeling workflow.',
     ],
     outcome:
-      'On held-out validation data, reached 92% IoU on the minority class and 98% IoU on the majority class, with 98% overall accuracy. Also shortened the iteration loop and mentored an intern through the modeling and data-pipeline work.',
-    evidence: ['~3M labeled points', '92% minority-class IoU', '98% majority-class IoU', '98% overall accuracy'],
+      'On held-out validation data, the operationally important minority class reached 92% IoU, against 98% IoU on the majority class. Overall accuracy also reads 98%, but on a point cloud this imbalanced that number is close to what predicting the majority class alone would score — the minority-class IoU is what the model was tuned and judged on. The work also shortened the iteration loop, and I mentored an intern through the modeling and data-pipeline work.',
+    note:
+      'Those ~3 million points did not label themselves. The intern and I spent two months annotating them, running on our last two brain cells.',
+    evidence: ['92% minority-class IoU', '98% majority-class IoU', '~3M labeled points', 'Held-out validation'],
     stack: ['RandLA-Net', 'KPConvNeXt', 'PDAL', 'PyTorch', 'Focal Loss'],
   },
   {
@@ -89,51 +119,195 @@ const caseStudies: CaseStudy[] = [
       'Design the capture flow around the constraints of the person collecting the data.',
     ],
     outcome:
-      'The application is still in development. The current goal is a usable capture workflow and better depth priors—not a polished demo claim before the system earns it.',
+      'The app is still in development. The current goal is a usable capture workflow and better depth priors—not a polished demo claim before the system has earned it.',
     evidence: ['ARKit pose', 'LiDAR depth', 'On-device + cloud paths'],
     stack: ['Swift', 'ARKit', 'LiDAR', 'SLAM', 'Gaussian Splatting'],
     status: 'In progress',
   },
 ];
 
-const earlierWork = [
+type EarlierProject = {
+  title: string;
+  year: string;
+  description: string;
+  github: string;
+  image?: string;
+  video?: string;
+  poster?: string;
+  alt?: string;
+};
+
+const earlierWork: { group: string; projects: EarlierProject[] }[] = [
   {
     group: 'Computer Vision',
     projects: [
-      ['Structure from Motion', '2022', 'A from-scratch SfM pipeline covering geometry, triangulation, and bundle adjustment.', 'https://github.com/ParamDave5/Structure-From-Motion'],
-      ['Stereo Vision', '2022', 'Calibration, rectification, correspondence, and metric depth from stereo imagery.', 'https://github.com/ParamDave5/Stereo-Vision'],
-      ['Lane Detection & Guidance', '2022', 'Lane-boundary detection and turn guidance using perspective warping and polynomial fitting.', 'https://github.com/ParamDave5/Lane-Detection'],
-      ['AR Tag Detection', '2022', 'Homography-based tag decoding with real-time image and 3D cube overlays.', 'https://github.com/ParamDave5/AprilTag-Homography'],
-      ['Probability-Based Boundary Detection', '2021', 'A simplified PB detector combining texture, color, and intensity gradients.', 'https://github.com/ParamDave5/Probability-Based-Boundary-Detection'],
-      ['Panorama Stitching', '2021', 'Automatic multi-image stitching with feature matching and homography-based warping.', 'https://github.com/ParamDave5/Panoram-Stiching'],
-      ['Face Swap', '2021', 'Face warping and blending with Delaunay triangulation and Thin Plate Splines.', 'https://github.com/ParamDave5/FaceSwap'],
-      ['Camera Calibration', '2021', 'Automatic intrinsic and extrinsic calibration from checkerboard imagery.', 'https://github.com/ParamDave5/AutoCalib'],
+      {
+        title: 'Structure from Motion',
+        year: '2022',
+        description: 'A from-scratch SfM pipeline covering geometry, triangulation, and bundle adjustment.',
+        github: 'https://github.com/ParamDave5/Structure-From-Motion',
+        image: 'sfm.webp',
+        alt: 'Sparse 3D point cloud and estimated camera poses recovered by bundle adjustment.',
+      },
+      {
+        title: 'Stereo Vision',
+        year: '2022',
+        description: 'Calibration, rectification, correspondence, and metric depth from stereo imagery.',
+        github: 'https://github.com/ParamDave5/Stereo-Vision',
+        image: 'stereo.webp',
+        alt: 'Rectified stereo pair beside the computed disparity and depth maps.',
+      },
+      {
+        title: 'Lane Detection & Guidance',
+        year: '2022',
+        description: 'Lane-boundary detection and turn guidance using perspective warping and polynomial fitting.',
+        github: 'https://github.com/ParamDave5/Lane-Detection',
+        video: 'lane.mp4',
+        poster: 'lane-poster.webp',
+        alt: 'Dashcam footage with detected lane boundaries and turn guidance overlaid.',
+      },
+      {
+        title: 'AR Tag Detection',
+        year: '2022',
+        description: 'Homography-based tag decoding with real-time image and 3D cube overlays.',
+        github: 'https://github.com/ParamDave5/AprilTag-Homography',
+        video: 'artag.mp4',
+        poster: 'artag-poster.webp',
+        alt: 'A virtual cube tracked onto a printed AR tag as the camera moves.',
+      },
+      {
+        title: 'Probability-Based Boundary Detection',
+        year: '2021',
+        description: 'A simplified PB detector combining texture, color, and intensity gradients.',
+        github: 'https://github.com/ParamDave5/Probability-Based-Boundary-Detection',
+        image: 'pblite.webp',
+        alt: 'Probability-weighted boundary map produced by the PB-lite detector.',
+      },
+      {
+        title: 'Panorama Stitching',
+        year: '2021',
+        description: 'Automatic multi-image stitching with feature matching and homography-based warping.',
+        github: 'https://github.com/ParamDave5/Panoram-Stiching',
+        image: 'panorama.webp',
+        alt: 'Multiple photographs warped and blended into a single panorama.',
+      },
+      {
+        title: 'Face Swap',
+        year: '2021',
+        description: 'Face warping and blending with Delaunay triangulation and Thin Plate Splines.',
+        github: 'https://github.com/ParamDave5/FaceSwap',
+        image: 'faceswap.webp',
+        alt: 'Two faces swapped using Delaunay triangulation and thin plate spline warping.',
+      },
+      {
+        title: 'Camera Calibration',
+        year: '2021',
+        description: 'Automatic intrinsic and extrinsic calibration from checkerboard imagery.',
+        github: 'https://github.com/ParamDave5/AutoCalib',
+        image: 'camcalib.webp',
+        alt: 'Checkerboard target with detected corners used to solve for camera intrinsics.',
+      },
     ],
   },
   {
     group: 'Deep Learning',
     projects: [
-      ['Gesture-Operated Robot', '2022', 'A Jetson Nano robot controlled by gestures from a lightweight OpenPose model at 20 FPS.', 'https://github.com/ParamDave5/Pose-Estimation-Gesture-Operated-Robot'],
-      ['3D MRI CNN Super-Resolution', '2022', 'Reproduced and extended CNN-IL, improving SSIM and PSNR with a custom architecture.', 'https://github.com/ParamDave5/3D-MRI-CNN-Super-Resolution'],
-      ['SfMLearner', '2022', 'Extended monocular depth and ego-motion learning with a ResNet backbone and SSIM loss.', 'https://github.com/ParamDave5/SFM-Learner'],
+      {
+        title: 'Gesture-Operated Robot',
+        year: '2022',
+        description: 'A Jetson Nano robot controlled by gestures from a lightweight OpenPose model at 20 FPS.',
+        github: 'https://github.com/ParamDave5/Pose-Estimation-Gesture-Operated-Robot',
+      },
+      {
+        title: '3D MRI CNN Super-Resolution',
+        year: '2022',
+        description: 'Reproduced and extended CNN-IL, improving SSIM and PSNR with a custom architecture.',
+        github: 'https://github.com/ParamDave5/3D-MRI-CNN-Super-Resolution',
+        image: 'mri-sr.webp',
+        alt: 'Low-resolution MRI slice beside the super-resolved reconstruction.',
+      },
+      {
+        title: 'SfMLearner',
+        year: '2022',
+        description: 'Extended monocular depth and ego-motion learning with a ResNet backbone and SSIM loss.',
+        github: 'https://github.com/ParamDave5/SFM-Learner',
+        image: 'sfmlearner.webp',
+        alt: 'Monocular frame and the depth map predicted by the self-supervised network.',
+      },
     ],
   },
   {
     group: 'Machine Learning',
     projects: [
-      ['Handwritten Digit Recognition', '2022', 'Implemented classical classifiers and LeNet-5 from scratch.', 'https://github.com/ParamDave5/Handwritten-Digit-Recognition-and-Transfer-Learning'],
-      ['Face & Expression Recognition', '2022', 'Compared Bayes, kNN, Kernel SVM, and Boosted SVM with PCA/MDA.', 'https://github.com/ParamDave5/Facial-Recognition'],
-      ['Monkey Species Classification', '2022', 'Transfer-learned ResNet-34 and ResNet-50 after building a custom CNN baseline.', 'https://github.com/ParamDave5/Handwritten-Digit-Recognition-and-Transfer-Learning'],
+      {
+        title: 'Handwritten Digit Recognition',
+        year: '2022',
+        description: 'Implemented classical classifiers and LeNet-5 from scratch.',
+        github: 'https://github.com/ParamDave5/Handwritten-Digit-Recognition-and-Transfer-Learning',
+        image: 'digits.webp',
+        alt: 'Handwritten digit samples with predicted labels.',
+      },
+      {
+        title: 'Face & Expression Recognition',
+        year: '2022',
+        description: 'Compared Bayes, kNN, Kernel SVM, and Boosted SVM with PCA/MDA.',
+        github: 'https://github.com/ParamDave5/Facial-Recognition',
+        image: 'faces.webp',
+        alt: 'Face dataset samples used to compare classical classifiers.',
+      },
+      {
+        title: 'Monkey Species Classification',
+        year: '2022',
+        description: 'Transfer-learned ResNet-34 and ResNet-50 after building a custom CNN baseline.',
+        github: 'https://github.com/ParamDave5/Handwritten-Digit-Recognition-and-Transfer-Learning/blob/main/code/transfer_learning.ipynb',
+        image: 'monkey.webp',
+        alt: 'Monkey species samples with predictions from the transfer-learned model.',
+      },
     ],
   },
   {
     group: 'Robotics & Planning',
     projects: [
-      ['Real-Time RRT*', '2022', 'Continuous replanning for a holonomic robot with dynamic obstacles and a moving goal.', 'https://github.com/ParamDave5/Real-Time-RRT'],
-      ['A* on TurtleBot 3', '2022', 'Path planning with obstacle inflation and real-time replanning in Gazebo.', 'https://github.com/ParamDave5/A-Star-on-TurtleBot'],
-      ['Planning Algorithms Benchmark', '2022', 'Compared BFS, Dijkstra, A*, and RT-RRT* on differential-drive robots.', 'https://github.com/ParamDave5/Path_Planning-Algorithms'],
-      ['Urban Search & Rescue Robot', '2021', 'Coordinated two TurtleBots using AprilTags, transforms, and MoveBase.', 'https://github.com/ParamDave5/Simplified-Urban-Search-and-Rescue'],
-      ['LQR / LQG Crane Control', '2021', 'Modeled and controlled a nonlinear crane double pendulum in MATLAB.', 'https://github.com/ParamDave5/LQR-LQG-Control-for-Double-Pendulum'],
+      {
+        title: 'Real-Time RRT*',
+        year: '2022',
+        description: 'Continuous replanning for a holonomic robot with dynamic obstacles and a moving goal.',
+        github: 'https://github.com/ParamDave5/Real-Time-RRT',
+        image: 'rrt.webp',
+        alt: 'RRT* search tree expanding around obstacles toward a moving goal.',
+      },
+      {
+        title: 'A* on TurtleBot 3',
+        year: '2022',
+        description: 'Path planning with obstacle inflation and real-time replanning in Gazebo.',
+        github: 'https://github.com/ParamDave5/A-Star-on-TurtleBot',
+        image: 'astar.webp',
+        alt: 'A* path through an inflated-obstacle occupancy map in Gazebo.',
+      },
+      {
+        title: 'Planning Algorithms Benchmark',
+        year: '2022',
+        description: 'Compared BFS, Dijkstra, A*, and RT-RRT* on differential-drive robots.',
+        github: 'https://github.com/ParamDave5/Path_Planning-Algorithms',
+        image: 'planning.webp',
+        alt: 'Explored nodes and final paths from the compared planning algorithms.',
+      },
+      {
+        title: 'Urban Search & Rescue Robot',
+        year: '2021',
+        description: 'Coordinated two TurtleBots using AprilTags, transforms, and MoveBase.',
+        github: 'https://github.com/ParamDave5/Simplified-Urban-Search-and-Rescue',
+        image: 'usar.webp',
+        alt: 'Two TurtleBots locating AprilTag markers in a simulated disaster arena.',
+      },
+      {
+        title: 'LQR / LQG Crane Control',
+        year: '2021',
+        description: 'Modeled and controlled a nonlinear crane double pendulum in MATLAB.',
+        github: 'https://github.com/ParamDave5/LQR-LQG-Control-for-Double-Pendulum',
+        image: 'crane.webp',
+        alt: 'State response plots for the LQR and LQG controlled double pendulum.',
+      },
     ],
   },
 ];
@@ -142,14 +316,14 @@ const earlierWork = [
   title="Selected Work — Param Dave"
   description="Case studies in reliable LLM systems, 3D perception, and turning machine-learning research into production systems."
 >
-  <section class="mx-auto max-w-5xl px-6 pt-16 pb-12 sm:pt-20">
+  <section class="mx-auto max-w-5xl px-6 pt-11 pb-9 sm:pt-14">
     <p class="font-mono text-xs tracking-widest text-amber-600 uppercase dark:text-amber-400">
       Selected work
     </p>
-    <h1 class="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
+    <h1 class="mt-3 max-w-3xl text-2xl font-semibold tracking-tight sm:text-4xl">
       Business constraints, research questions, shipped systems.
     </h1>
-    <p class="mt-5 max-w-2xl text-lg text-neutral-600 dark:text-neutral-400">
+    <p class="mt-5 max-w-2xl text-base text-stone-600 dark:text-stone-400">
       Each case starts with an outcome that matters, works down through the technical
       uncertainty, and ends with something measurable, reliable, and useful in a real workflow.
     </p>
@@ -157,26 +331,45 @@ const earlierWork = [
       {caseStudies.map((study) => (
         <a
           href={`#${study.id}`}
-          class="rounded-md border border-neutral-200 px-3 py-1.5 font-mono text-neutral-600 hover:border-amber-500 hover:text-amber-600 dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
+          class="rounded-md border border-stone-200 px-3 py-1.5 font-mono text-stone-600 hover:border-amber-500 hover:text-amber-600 dark:border-stone-800 dark:text-stone-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
         >
           {study.area}
         </a>
       ))}
     </div>
-    <p class="mt-6 max-w-2xl text-xs leading-relaxed text-neutral-500">
-      These case studies intentionally describe the technical decisions and outcomes without
+    <p class="mt-6 max-w-2xl text-xs leading-relaxed text-stone-500">
+      These case studies deliberately describe the technical decisions and outcomes without
       exposing proprietary data, customer material, or internal system details.
     </p>
   </section>
 
-  <section class="mx-auto max-w-5xl px-6 pb-16">
+  <section class="mx-auto max-w-5xl px-6 pb-10">
+    <Meme
+      imgWidth="270px"
+      src="benchmark-vs-production.webp"
+      alt="Drake rejecting one option and approving another in a two-panel reaction meme."
+      width={400}
+      height={322}
+    >
+      <div slot="overlay" class="top-0 absolute right-0 flex h-1/2 w-[51%] items-center justify-center p-[3cqw] text-center text-[8cqw] leading-none font-black tracking-tight text-white" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; -webkit-text-stroke: 0.35cqw #111; text-shadow: 0.25cqw 0.25cqw 0 #111;">Benchmarks</div>
+      <div slot="overlay" class="bottom-0 absolute right-0 flex h-1/2 w-[51%] items-center justify-center p-[3cqw] text-center text-[8cqw] leading-none font-black tracking-tight text-white" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; -webkit-text-stroke: 0.35cqw #111; text-shadow: 0.25cqw 0.25cqw 0 #111;">Production<br />Results</div>
+      <p class="handwritten marker inline text-[17px] text-stone-800 dark:text-stone-100">
+        Benchmarks are polite. Production data is more honest.
+      </p>
+      <p class="mt-3 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+        The benchmark gets the system out the door. The anomaly decides what I investigate next.
+      </p>
+    </Meme>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 pb-12">
     <div class="space-y-8">
       {caseStudies.map((study) => (
-        <article id={study.id} class="scroll-mt-24 rounded-xl border border-neutral-200 p-6 sm:p-8 dark:border-neutral-800">
+        <article id={study.id} class="scroll-mt-24 rounded-xl border border-stone-200 p-6 sm:p-8 dark:border-stone-800">
           <header class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div class="flex flex-wrap items-center gap-2">
-                <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
+                <p class="text-xs font-semibold text-amber-600 dark:text-amber-400">
                   {study.area}
                 </p>
                 {study.status && (
@@ -185,58 +378,99 @@ const earlierWork = [
                   </span>
                 )}
               </div>
-              <h2 class="mt-2 text-2xl font-semibold tracking-tight">{study.title}</h2>
+              <h2 class="mt-2 text-xl font-semibold tracking-tight">{study.title}</h2>
             </div>
-            <span class="font-mono text-xs text-neutral-500">{study.period}</span>
+            <span class="font-mono text-xs text-stone-500">{study.period}</span>
           </header>
 
-          <div class="mt-6 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900/60">
-            <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Core question</p>
+          <div class="mt-6 rounded-lg bg-stone-50 p-4 dark:bg-stone-900/60">
+            <p class="text-xs font-semibold text-stone-500">Core question</p>
             <p class="mt-2 text-base font-medium">{study.question}</p>
           </div>
 
           <div class="mt-7 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">The constraint</h3>
-              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+              <h3 class="text-xs font-semibold text-stone-500">The constraint</h3>
+              <p class="mt-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
                 {study.context}
               </p>
 
-              <h3 class="mt-7 font-mono text-[10px] tracking-widest text-neutral-500 uppercase">What shipped</h3>
-              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+              <h3 class="mt-7 text-xs font-semibold text-stone-500">What shipped</h3>
+              <p class="mt-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
                 {study.outcome}
               </p>
             </div>
 
             <div>
-              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Investigation → system</h3>
+              {study.deadEnd && (
+                <div class="mb-7 border-l-2 border-stone-300 pl-4 dark:border-stone-700">
+                  <h3 class="text-xs font-semibold text-stone-500">First attempt, and why it did not hold</h3>
+                  <p class="mt-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                    {study.deadEnd.approach}
+                  </p>
+                  <p class="mt-2 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+                    {study.deadEnd.why}
+                  </p>
+                </div>
+              )}
+              <h3 class="text-xs font-semibold text-stone-500">Investigation → system</h3>
               <ol class="mt-3 space-y-3">
                 {study.approach.map((step, index) => (
-                  <li class="flex gap-3 rounded-lg border border-neutral-200 p-3 text-sm leading-relaxed dark:border-neutral-800">
+                  <li class="flex gap-3 text-sm leading-relaxed">
                     <span class="font-mono text-[10px] text-amber-600 dark:text-amber-400">
                       0{index + 1}
                     </span>
-                    <span class="text-neutral-700 dark:text-neutral-300">{step}</span>
+                    <span class="text-stone-700 dark:text-stone-300">{step}</span>
                   </li>
                 ))}
               </ol>
+
+              {study.note && (
+                <p class="handwritten mt-8 border-l-2 border-amber-400 pl-4 text-[18px] leading-relaxed text-stone-600 dark:text-stone-300">
+                  {study.note}
+                </p>
+              )}
             </div>
           </div>
 
-          <footer class="mt-7 grid gap-5 border-t border-neutral-200 pt-5 sm:grid-cols-2 dark:border-neutral-800">
+          {study.id === 'reliable-agents' && <GeniePipeline />}
+
+          {study.id === 'lidar-segmentation' && (
+            <figure class="mx-auto mt-8 max-w-2xl overflow-hidden rounded-xl border border-stone-200 bg-[#f8faef] dark:border-stone-700">
+              <img
+                src={`${base}/img/lidar-tower-segmentation.webp`}
+                alt="Three point-cloud segmentation views of transmission towers, with two structures highlighted in yellow and one in blue."
+                width="1768"
+                height="890"
+                loading="lazy"
+                decoding="async"
+                class="h-auto w-full"
+              />
+              <figcaption class="flex flex-wrap items-center justify-between gap-2 border-t border-stone-200 bg-white px-4 py-3 text-xs dark:border-stone-700 dark:bg-stone-950">
+                <span class="font-semibold text-stone-700 dark:text-stone-300">
+                  Qualitative segmentation
+                </span>
+                <span class="font-mono text-[10px] text-stone-500">
+                  Transmission-tower geometries
+                </span>
+              </figcaption>
+            </figure>
+          )}
+
+          <footer class="mt-7 grid gap-5 border-t border-stone-200 pt-5 sm:grid-cols-2 dark:border-stone-800">
             <div>
-              <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Evidence</p>
+              <p class="text-xs font-semibold text-stone-500">Evidence</p>
               <div class="mt-2 flex flex-wrap gap-2">
                 {study.evidence.map((item) => (
-                  <span class="rounded-md bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                  <span class="rounded-md bg-stone-100 px-2.5 py-1 text-xs text-stone-700 dark:bg-stone-900 dark:text-stone-300">
                     {item}
                   </span>
                 ))}
               </div>
             </div>
             <div>
-              <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Tools</p>
-              <p class="mt-2 font-mono text-[11px] leading-relaxed text-neutral-500">
+              <p class="text-xs font-semibold text-stone-500">Tools</p>
+              <p class="mt-2 font-mono text-[11px] leading-relaxed text-stone-500">
                 {study.stack.join(' · ')}
               </p>
             </div>
@@ -246,42 +480,69 @@ const earlierWork = [
     </div>
   </section>
 
-  <section class="border-t border-neutral-200 dark:border-neutral-800">
-    <div class="mx-auto max-w-5xl px-6 py-14">
+  <section class="border-t border-stone-200 dark:border-stone-800">
+    <div class="mx-auto max-w-5xl px-6 py-10">
       <details class="group">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-6">
           <div>
-            <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Earlier work</p>
-            <h2 class="mt-2 text-2xl font-semibold tracking-tight">Coursework and foundations</h2>
-            <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-              Computer vision, deep learning, classical ML, robotics, and planning projects from 2021–22.
+            <p class="text-xs font-semibold text-stone-500">Earlier work</p>
+            <h2 class="mt-2 text-xl font-semibold tracking-tight">Coursework and foundations</h2>
+            <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">
+              University projects from 2021–22. Kept partly because the fundamentals hold up, mostly because deleting them sounded like work.
             </p>
           </div>
-          <span class="text-2xl text-neutral-400 transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+          <span class="text-xl text-stone-500 transition-transform group-open:rotate-45 dark:text-stone-400" aria-hidden="true">+</span>
         </summary>
 
         <div class="mt-10 space-y-10">
           {earlierWork.map((group) => (
             <section>
-              <h3 class="border-b border-neutral-200 pb-3 text-lg font-semibold dark:border-neutral-800">
+              <h3 class="border-b border-stone-200 pb-3 text-base font-semibold dark:border-stone-800">
                 {group.group}
               </h3>
-              <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                {group.projects.map(([title, year, description, github]) => (
-                  <article class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-                    <div class="flex items-start justify-between gap-3">
-                      <h4 class="text-sm font-semibold">{title}</h4>
-                      <span class="font-mono text-[10px] text-neutral-500">{year}</span>
+              <div class="mt-4 grid items-start gap-3 sm:grid-cols-2">
+                {group.projects.map((project) => (
+                  <article class="overflow-hidden rounded-lg border border-stone-200 dark:border-stone-800">
+                    {(project.image || project.video) && (
+                      <div class="aspect-[16/10] w-full border-b border-stone-200 bg-stone-100 dark:border-stone-800 dark:bg-stone-900">
+                        {project.video ? (
+                          <video
+                            class="h-full w-full object-contain"
+                            src={`${base}/img/${project.video}`}
+                            poster={project.poster ? `${base}/img/${project.poster}` : undefined}
+                            aria-label={project.alt}
+                            autoplay
+                            loop
+                            muted
+                            playsinline
+                            preload="none"
+                          />
+                        ) : (
+                          <img
+                            class="h-full w-full object-contain"
+                            src={`${base}/img/${project.image}`}
+                            alt={project.alt ?? ''}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        )}
+                      </div>
+                    )}
+                    <div class="p-4">
+                      <div class="flex items-start justify-between gap-3">
+                        <h4 class="text-sm font-semibold">{project.title}</h4>
+                        <span class="font-mono text-[10px] text-stone-500">{project.year}</span>
+                      </div>
+                      <p class="mt-2 text-sm text-stone-600 dark:text-stone-400">{project.description}</p>
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener"
+                        class="mt-3 inline-block text-xs font-medium text-amber-600 hover:underline dark:text-amber-400"
+                      >
+                        GitHub ↗
+                      </a>
                     </div>
-                    <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{description}</p>
-                    <a
-                      href={github}
-                      target="_blank"
-                      rel="noopener"
-                      class="mt-3 inline-block text-xs font-medium text-amber-600 hover:underline dark:text-amber-400"
-                    >
-                      GitHub ↗
-                    </a>
                   </article>
                 ))}
               </div>
@@ -292,17 +553,17 @@ const earlierWork = [
     </div>
   </section>
 
-  <section class="mx-auto max-w-5xl px-6 py-14">
-    <div class="rounded-xl bg-neutral-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8 dark:bg-neutral-100 dark:text-neutral-900">
+  <section class="mx-auto max-w-5xl px-6 py-10">
+    <div class="rounded-xl bg-stone-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8 dark:bg-stone-100 dark:text-stone-900">
       <div>
         <h2 class="text-xl font-semibold">Want the chronological version?</h2>
-        <p class="mt-2 text-sm text-neutral-300 dark:text-neutral-600">
+        <p class="mt-2 text-sm text-stone-300 dark:text-stone-600">
           The experience page contains the full role-by-role record.
         </p>
       </div>
       <a
         href={`${base}/experience`}
-        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-amber-300 sm:mt-0 dark:bg-neutral-900 dark:text-white"
+        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-amber-300 sm:mt-0 dark:bg-stone-900 dark:text-white"
       >
         View experience →
       </a>

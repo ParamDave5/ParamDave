@@ -1,218 +1,402 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Meme from '../components/Meme.astro';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-const activeInvestigations = [
+type ResearchPillar = {
+  number: string;
+  id: string;
+  verb: string;
+  area: string;
+  status: string;
+  question: string;
+  thesis: string;
+  current: string[];
+  related?: string;
+  readingGroups?: {
+    label: string;
+    papers: {
+      title: string;
+      focus: string;
+      url: string;
+    }[];
+  }[];
+};
+
+const researchPillars: ResearchPillar[] = [
   {
-    id: 'agent-reliability',
-    status: 'Active',
-    area: 'Agents & evaluation',
-    title: 'Making model behavior verifiable',
+    number: '01',
+    id: 'physical-ai',
+    verb: 'Act',
+    area: 'Physical AI and spatial reasoning',
+    status: 'New research direction',
     question:
-      'Can an evaluation reveal why an agent failed—and whether it reached the right answer for the right reason?',
-    motivation:
-      'A single aggregate score compresses away the distinction between perception, reasoning, tool-use, formatting, and verification failures. That makes the number hard to act on.',
-    currentWork: [
-      'Decomposing failed runs into specific, actionable failure modes.',
-      'Comparing automated grading, adversarial probing, and grounded verification.',
-      'Generating synthetic document questions that resemble real user intent rather than template variations.',
+      'How can an intelligent system learn from diverse experience, generalize across tasks and embodiments, and transfer reliably from simulation to the real world?',
+    thesis:
+      'Physical intelligence depends on more than a capable policy. It requires scalable data collection, representations that connect perception to action, and learning systems that transfer across tasks, environments, embodiments, and the simulation-to-reality gap.',
+    current: [
+      'Reading the Physical Intelligence π-series and GR00T to understand generalist vision-language-action policies, open-world generalization, and cross-embodiment transfer.',
+      'Studying how teleoperation, human video, robot experience, and synthetic data can be collected and combined into scalable training mixtures.',
+      'Connecting prior work in robotics, 3D perception, reconstruction, and geometry to sim-to-real transfer, adaptation from corrections, and failure diagnosis in long-horizon physical tasks.',
     ],
-    learned:
-      'Evaluation quality is itself an empirical question. A grader or benchmark should be tested for sensitivity, failure coverage, and usefulness to the person deciding what to change next.',
-    related: 'reliable-agents',
+    readingGroups: [
+      {
+        label: 'Physical Intelligence · π model series',
+        papers: [
+          {
+            title: 'π0: A Vision-Language-Action Flow Model for General Robot Control',
+            focus: 'Generalist policies and continuous action generation',
+            url: 'https://arxiv.org/abs/2410.24164',
+          },
+          {
+            title: 'π0.5: A Vision-Language-Action Model with Open-World Generalization',
+            focus: 'Knowledge transfer and generalization beyond the lab',
+            url: 'https://arxiv.org/abs/2504.16054',
+          },
+          {
+            title: 'π*0.6: A VLA That Learns From Experience',
+            focus: 'Reinforcement learning from experience and corrections',
+            url: 'https://arxiv.org/abs/2511.14759',
+          },
+        ],
+      },
+      {
+        label: 'Physical Intelligence · research papers',
+        papers: [
+          {
+            title: 'FAST: Efficient Action Tokenization for Vision-Language-Action Models',
+            focus: 'Fast, transferable tokenization for high-frequency robot actions',
+            url: 'https://www.pi.website/research/fast',
+          },
+          {
+            title: 'Hi Robot: Open-Ended Instruction Following with Hierarchical VLAs',
+            focus: 'Deliberative high-level reasoning paired with reactive control',
+            url: 'https://www.pi.website/research/hirobot',
+          },
+          {
+            title: 'Emergence of Human to Robot Transfer in Vision-Language-Action Models',
+            focus: 'Human-video transfer enabled by diverse VLA pre-training',
+            url: 'https://www.pi.website/research/human_to_robot',
+          },
+          {
+            title: 'Knowledge Insulating Vision-Language-Action Models',
+            focus: 'Preserving VLM knowledge while training efficient action experts',
+            url: 'https://www.pi.website/research/knowledge_insulation',
+          },
+          {
+            title: 'MEM: Multi-Scale Embodied Memory for Vision Language Action Models',
+            focus: 'Visual short-term and semantic long-term memory for robot policies',
+            url: 'https://www.pi.website/research/memory',
+          },
+          {
+            title: 'Real-Time Execution of Action Chunking Flow Policies',
+            focus: 'Asynchronous action generation without retraining the policy',
+            url: 'https://arxiv.org/abs/2506.07339',
+          },
+          {
+            title: 'Training-Time Action Conditioning for Efficient Real-Time Chunking',
+            focus: 'Training policies for smooth, latency-aware real-time control',
+            url: 'https://arxiv.org/abs/2512.05964',
+          },
+          {
+            title: 'Precise Manipulation with Efficient Online RL',
+            focus: 'Fast online adaptation for precise and dexterous manipulation',
+            url: 'https://www.pi.website/research/rlt',
+          },
+        ],
+      },
+      {
+        label: 'NVIDIA · GR00T',
+        papers: [
+          {
+            title: 'NVIDIA Isaac GR00T N1: An Open Foundation Model for Humanoid Robots',
+            focus: 'A dual-system foundation model for generalist humanoid control',
+            url: 'https://arxiv.org/abs/2503.14734',
+          },
+        ],
+      },
+    ],
   },
   {
+    number: '02',
     id: 'grounded-reasoning',
-    status: 'Evaluating',
-    area: 'Multimodal reasoning',
-    title: 'Grounding an answer in the evidence behind it',
+    verb: 'Ground',
+    area: 'Grounded multimodal reasoning and post-training',
+    status: 'Submission under evaluation',
     question:
-      'Can a vision-language model connect its rationale to the image regions that actually support the conclusion?',
-    motivation:
-      'A fluent diagnosis is not trustworthy merely because it sounds coherent. In high-stakes visual domains, the model should expose which evidence its answer depends on.',
-    currentWork: [
-      'Participating in a closed evaluation challenge for image-grounded reasoning in medical imagery.',
-      'Post-training Qwen3-VL-8B: first implementing a vanilla GRPO baseline, then a DAPO-based variant augmented with PaPO’s perception-aware objective.',
-      'Using corruption augmentation to improve robustness to degraded or shifted visual inputs.',
-      'Running distributed RL post-training with PyTorch DDP and TRL across a GeForce RTX 5090 and 32 GB RTX PRO 4500 Blackwell, using a custom gated reward whose veto judge combines InternVL and GLM-VL.',
+      'Can a multimodal model connect its conclusion to the visual evidence that actually supports it?',
+    thesis:
+      'A fluent rationale isn\'t trustworthy simply because it sounds coherent. A grounded system should be right about the answer and expose whether its reasoning depends on the correct evidence.',
+    current: [
+      'Submitted work through an evaluation competition; details and results go up when I can share them.',
+      'Working down the post-training line: PPO, then GRPO, its DAPO variant, and PAPO — which adds an implicit perception loss on top of GRPO so a multimodal model has to use the image instead of reasoning around it.',
+      'Exploring corruption augmentation, gated rewards, and grounded verification for failures caused by degraded or shifted visual evidence.',
     ],
-    learned:
-      'Grounding changes both the training signal and the evaluation target: the system must be right about the answer and about the visual evidence it claims to have used.',
+  },
+  {
+    number: '03',
+    id: 'agent-evaluation',
+    verb: 'Verify',
+    area: 'Agent evaluation and failure diagnosis',
+    status: 'Built & evolving',
+    question:
+      'How do we determine why an agent failed, not merely whether it failed?',
+    thesis:
+      'A single score hides the distinction between perception, generation, tool use, evaluation, and verification failures. An evaluation becomes useful when it identifies the behavior that broke and helps decide what to change next.',
+    current: [
+      'Designing pre-production quality gates with automated grading, adversarial probing, and red-teaming.',
+      'Turning post-production failures into reproducible, component-level diagnoses instead of undifferentiated error logs.',
+      'Testing whether synthetic questions resemble real user intent closely enough to expose meaningful weaknesses.',
+    ],
+    related: 'reliable-agents',
   },
 ];
 
-const questionQueue = [
+const paperCount = (pillar: ResearchPillar) =>
+  (pillar.readingGroups ?? []).reduce((total, group) => total + group.papers.length, 0);
+
+const sourceLabel = (pillar: ResearchPillar) =>
+  [...new Set((pillar.readingGroups ?? []).map((group) => group.label.split(' · ')[0]))]
+    .join(' + ');
+
+const principles = [
   {
-    area: 'Inference systems',
-    question: 'Which optimizations survive contact with real traffic?',
-    detail:
-      'Quantization, speculative decoding, batching, and serving topologies often look different under production request distributions than they do in published throughput benchmarks.',
-    lens: 'vLLM · SGLang · llama.cpp',
+    title: 'Diagnosis over a single score',
+    copy: 'A metric should reveal which behavior failed and make the next engineering or research decision clearer.',
   },
   {
-    area: 'Post-training',
-    question: 'What improves reasoning rather than the appearance of reasoning?',
-    detail:
-      'I am interested in faithful intermediate steps, verifiable rewards, and training signals that generalize beyond the benchmark used to optimize them.',
-    lens: 'GRPO · DAPO · PaPO · gated rewards · LoRA / QLoRA',
+    title: 'Evidence over eloquence',
+    copy: 'A confident explanation matters only when it is connected to the visual, textual, or physical evidence behind it.',
   },
   {
-    area: 'Physical AI',
-    question: 'What changes when a model can be wrong in the physical world?',
-    detail:
-      'Robotics and 3D perception force models to deal with partial observation, action, geometry, and consequences—not only a larger context window.',
-    lens: 'SLAM · LiDAR · spatial reasoning',
+    title: 'Consequences change evaluation',
+    copy: 'When a model can act in the world, partial observation, geometry, recovery, and the cost of failure become part of intelligence.',
+  },
+  {
+    title: 'Research returns to the system',
+    copy: 'An idea earns its value when it survives implementation, real workflows, and the failures that appear after deployment.',
   },
 ];
 ---
 <Layout
-  title="Research Questions — Param Dave"
-  description="Active investigations into reliable agents, grounded reasoning, inference systems, post-training, and physical AI."
+  title="Research Manifesto — Param Dave"
+  description="A research manifesto spanning agent evaluation, grounded multimodal reasoning, post-training, physical AI, and spatial intelligence."
 >
-  <section class="mx-auto max-w-5xl px-6 pt-16 pb-12 sm:pt-20">
+  <section class="mx-auto max-w-5xl px-6 pt-11 pb-10 sm:pt-14">
     <p class="font-mono text-xs tracking-widest text-amber-600 uppercase dark:text-amber-400">
-      Research questions
+      Research manifesto
     </p>
-    <h1 class="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-      What I am testing, not just what I am reading.
+    <h1 class="mt-3 max-w-4xl text-2xl font-semibold tracking-tight sm:text-4xl">
+      Intelligence should be verifiable, grounded, and able to act in the world.
     </h1>
-    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-neutral-400">
-      My research starts with failures observed in real systems. The business or user outcome
-      tells me which failures matter; I turn those into narrower questions, design an evaluation
-      that could prove the idea wrong, and carry useful results back into production.
+    <p class="mt-5 max-w-3xl text-base leading-relaxed text-stone-600 dark:text-stone-400">
+      I'm interested in the path from models that generate plausible answers to systems that
+      expose their evidence, diagnose their failures, and reason about the physical world. My
+      research follows three connected frontiers: understand how intelligence learns to act,
+      ground its reasoning in evidence, and verify its behavior when systems fail.
     </p>
 
-    <nav class="mt-8 flex flex-wrap gap-2 text-xs">
-      {activeInvestigations.map((item) => (
+    <Meme
+      class="mt-8"
+      tone="dark"
+      eager
+      imgWidth="390px"
+      src="ai-time-dilation.webp"
+      alt="Interstellar astronauts on an ocean planet beneath the caption: One month in AI is seven years everywhere else."
+      width={914}
+      height={514}
+    >
+      <p class="font-mono text-[10px] tracking-widest text-amber-400 uppercase">
+        Research time dilation
+      </p>
+      <p class="mt-2 text-sm font-semibold leading-snug">
+        Current bottleneck: papers are being published faster than I can read them.
+      </p>
+    </Meme>
+
+    <nav class="mt-9 grid gap-3 sm:grid-cols-3" aria-label="Research pillars">
+      {researchPillars.map((pillar) => (
         <a
-          href={`#${item.id}`}
-          class="rounded-md border border-neutral-200 px-3 py-1.5 font-mono text-neutral-600 hover:border-amber-500 hover:text-amber-600 dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
+          href={`#${pillar.id}`}
+          class="group border-t-2 border-stone-300 pt-3 transition-colors hover:border-amber-500 dark:border-stone-700 dark:hover:border-amber-400"
         >
-          {item.area}
+          <span class="font-mono text-[10px] text-stone-500 dark:text-stone-400">{pillar.number}</span>
+          <span class="mt-2 block text-sm font-semibold group-hover:text-amber-600 dark:group-hover:text-amber-400">
+            {pillar.verb}
+          </span>
+          <span class="mt-1 block text-xs leading-relaxed text-stone-500">{pillar.area}</span>
         </a>
       ))}
-      <a
-        href="#question-queue"
-        class="rounded-md border border-neutral-200 px-3 py-1.5 font-mono text-neutral-600 hover:border-amber-500 hover:text-amber-600 dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-amber-400 dark:hover:text-amber-400"
-      >
-        Question queue
-      </a>
     </nav>
   </section>
 
-  <section class="border-y border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/30">
-    <div class="mx-auto grid max-w-5xl gap-6 px-6 py-8 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-10">
-      <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Working definition</p>
-      <p class="max-w-3xl text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
-        Research is the disciplined reduction of uncertainty. Business outcomes determine
-        which uncertainty is worth reducing; shipping tests whether the answer was useful.
+  <section class="border-y border-stone-200 bg-stone-50/70 dark:border-stone-800 dark:bg-stone-900/30">
+    <div class="mx-auto grid max-w-5xl gap-5 px-6 py-8 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-12">
+      <p class="text-xs font-semibold text-stone-500">Working belief</p>
+      <p class="max-w-3xl text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+        Research is the disciplined reduction of uncertainty. The important questions are not
+        chosen by novelty alone: they emerge where capability, evidence, and real-world behavior
+        stop agreeing. Building the system tests whether the answer was actually useful.
       </p>
     </div>
   </section>
 
-  <section class="mx-auto max-w-5xl px-6 py-16">
-    <div class="space-y-8">
-      {activeInvestigations.map((item) => (
-        <article id={item.id} class="scroll-mt-24 rounded-xl border border-neutral-200 p-6 sm:p-8 dark:border-neutral-800">
-          <header class="flex flex-wrap items-start justify-between gap-4">
+  <section class="mx-auto max-w-5xl px-6 py-11">
+    <div class="space-y-10">
+      {researchPillars.map((pillar) => (
+        <article id={pillar.id} class="scroll-mt-24 border-t border-stone-200 pt-10 first:border-t-0 first:pt-0 dark:border-stone-800">
+          <header class="grid gap-5 lg:grid-cols-[0.34fr_1fr]">
             <div>
-              <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
-                {item.area}
+              <p class="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                {pillar.number} · {pillar.verb}
               </p>
-              <h2 class="mt-2 text-2xl font-semibold tracking-tight">{item.title}</h2>
+              <span class="mt-3 inline-block rounded-full bg-stone-100 px-2.5 py-1 font-mono text-[10px] text-stone-600 dark:bg-stone-900 dark:text-stone-400">
+                {pillar.status}
+              </span>
             </div>
-            <span class="rounded-full bg-amber-100 px-2.5 py-1 font-mono text-[10px] font-medium text-amber-700 dark:bg-amber-400/10 dark:text-amber-400">
-              {item.status}
-            </span>
+            <div>
+              <h2 class="text-xl font-semibold tracking-tight sm:text-2xl">{pillar.area}</h2>
+              <p class="mt-4 max-w-3xl text-base font-medium leading-relaxed">{pillar.question}</p>
+            </div>
           </header>
 
-          <div class="mt-6 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-900/60">
-            <p class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Core question</p>
-            <p class="mt-2 text-base font-medium">{item.question}</p>
-          </div>
-
-          <div class="mt-7 grid gap-8 lg:grid-cols-2">
+          <div class="mt-8 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
             <div>
-              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Why it matters</h3>
-              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
-                {item.motivation}
+              <h3 class="text-xs font-semibold text-stone-500">Manifesto</h3>
+              <p class="mt-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                {pillar.thesis}
               </p>
 
-              <h3 class="mt-7 font-mono text-[10px] tracking-widest text-neutral-500 uppercase">Current conclusion</h3>
-              <p class="mt-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
-                {item.learned}
-              </p>
-            </div>
-
-            <div>
-              <h3 class="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">What I am doing</h3>
-              <ul class="mt-3 space-y-3">
-                {item.currentWork.map((work) => (
-                  <li class="flex gap-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
-                    <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-amber-500"></span>
-                    <span>{work}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {item.related && (
+              {pillar.related && (
                 <a
-                  href={`${base}/projects#${item.related}`}
-                  class="mt-6 inline-block text-sm font-medium text-amber-600 hover:underline dark:text-amber-400"
+                  href={`${base}/projects#${pillar.related}`}
+                  class="mt-5 inline-block text-sm font-medium text-amber-600 hover:underline dark:text-amber-400"
                 >
                   See the related system →
                 </a>
               )}
             </div>
+
+            <div>
+              <h3 class="text-xs font-semibold text-stone-500">Current direction</h3>
+              <ul class="mt-3 space-y-3">
+                {pillar.current.map((item) => (
+                  <li class="flex gap-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                    <span class="mt-2 inline-block h-1 w-1 shrink-0 rounded-full bg-amber-500"></span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+
+          {pillar.id === 'grounded-reasoning' && (
+            <Meme
+              class="mt-8"
+              imgWidth="450px"
+              src="pooh-hallucination.webp"
+              alt="Three increasingly formal versions of Winnie the Pooh describing a model making something up, hallucinating, and performing evidentially ungrounded probabilistic synthesis."
+              width={915}
+              height={960}
+            >
+              <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+                Same failure. Increasingly sophisticated vocabulary.
+              </p>
+            </Meme>
+          )}
+
+          {pillar.id === 'agent-evaluation' && (
+            <Meme
+              class="mt-8"
+              imgWidth="420px"
+              src="evaluation-always-has-been.webp"
+              alt="One astronaut says that evaluation is part of the application while another replies: Always has been."
+              width={900}
+              height={500}
+            >
+              <p class="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+                Evaluation is not the final checkpoint. It is part of how the application gets built.
+              </p>
+            </Meme>
+          )}
+
+          {pillar.readingGroups && (
+            <div class="mt-8 border-t border-stone-200 pt-6 dark:border-stone-800">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 class="text-xs font-semibold text-stone-500">Currently reading</h3>
+                <span class="font-mono text-[10px] text-stone-500 dark:text-stone-400">
+                  {paperCount(pillar)} papers · {sourceLabel(pillar)}
+                </span>
+              </div>
+              <div class="mt-5 space-y-7">
+                {pillar.readingGroups.map((group) => (
+                  <section>
+                    <h4 class="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                      {group.label}
+                    </h4>
+                    <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {group.papers.map((paper) => (
+                        <a
+                          href={paper.url}
+                          target="_blank"
+                          rel="noopener"
+                          class="rounded-lg bg-stone-50 p-4 transition-colors hover:bg-amber-50 dark:bg-stone-900/60 dark:hover:bg-amber-400/5"
+                        >
+                          <span class="block text-sm font-semibold leading-snug">{paper.title}</span>
+                          <span class="mt-2 block text-xs leading-relaxed text-stone-500">{paper.focus}</span>
+                          <span class="mt-3 block text-xs font-medium text-amber-600 dark:text-amber-400">Read paper ↗</span>
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
       ))}
     </div>
   </section>
 
-  <section id="question-queue" class="scroll-mt-24 border-t border-neutral-200 dark:border-neutral-800">
-    <div class="mx-auto max-w-5xl px-6 py-16">
-      <p class="font-mono text-xs tracking-widest text-neutral-500 uppercase">Question queue</p>
-      <h2 class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-        Problems I am reading and prototyping around
+  <section class="border-y border-stone-200 bg-stone-50/70 dark:border-stone-800 dark:bg-stone-900/30">
+    <div class="mx-auto max-w-5xl px-6 py-11">
+      <p class="text-xs font-semibold text-stone-500">What I believe</p>
+      <h2 class="mt-2 max-w-2xl text-xl font-semibold tracking-tight sm:text-2xl">
+        Principles that connect the three frontiers
       </h2>
-      <p class="mt-3 max-w-2xl text-sm text-neutral-600 dark:text-neutral-400">
-        These are directions, not claims of finished research. They are here to make my
-        technical interests concrete and falsifiable.
-      </p>
-
-      <div class="mt-8 grid gap-5 lg:grid-cols-3">
-        {questionQueue.map((item) => (
-          <article class="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
-            <p class="font-mono text-[10px] tracking-widest text-amber-600 uppercase dark:text-amber-400">
-              {item.area}
-            </p>
-            <h3 class="mt-3 text-base font-semibold">{item.question}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-              {item.detail}
-            </p>
-            <p class="mt-5 border-t border-neutral-200 pt-4 font-mono text-[10px] leading-relaxed text-neutral-500 dark:border-neutral-800">
-              {item.lens}
-            </p>
+      <div class="mt-8 grid gap-x-8 gap-y-9 sm:grid-cols-2">
+        {principles.map((principle, index) => (
+          <article class="grid grid-cols-[auto_1fr] gap-4">
+            <span class="font-mono text-[10px] text-amber-600 dark:text-amber-400">0{index + 1}</span>
+            <div>
+              <h3 class="text-base font-semibold">{principle.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+                {principle.copy}
+              </p>
+            </div>
           </article>
         ))}
       </div>
     </div>
   </section>
 
-  <section class="mx-auto max-w-5xl px-6 py-14">
-    <div class="rounded-xl bg-neutral-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-8 dark:bg-neutral-100 dark:text-neutral-900">
+  <section class="mx-auto max-w-5xl px-6 py-10">
+    <div class="grid gap-8 rounded-xl bg-stone-900 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center dark:bg-stone-100 dark:text-stone-900">
       <div>
-        <h2 class="text-xl font-semibold">The implementation side matters too.</h2>
-        <p class="mt-2 text-sm text-neutral-300 dark:text-neutral-600">
-          See how these questions turn into deployed systems and measurable constraints.
+        <p class="text-xs font-semibold text-amber-400 dark:text-amber-600">
+          Research outputs
+        </p>
+        <h2 class="mt-2 text-xl font-semibold">Work in progress, claims when earned.</h2>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-stone-300 dark:text-stone-600">
+          One multimodal submission is currently under evaluation. Papers, artifacts, and
+          results go up here when they're public and I can stand behind them.
         </p>
       </div>
       <a
         href={`${base}/projects`}
-        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-amber-300 sm:mt-0 dark:bg-neutral-900 dark:text-white"
+        class="inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-amber-300 dark:bg-stone-900 dark:text-white"
       >
-        Explore selected work →
+        Explore shipped systems →
       </a>
     </div>
   </section>
