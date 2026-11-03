@@ -1,148 +1,81 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { mailto, nowLabel } from '../data/site';
-import Squiggle from '../components/Squiggle.astro';
-import WorkflowDiagram from '../components/WorkflowDiagram.astro';
+import { award, publication, roboticsCompetition } from '../data/achievements';
+import { mailto, resumeUrl, github, linkedin } from '../data/site';
+import '../styles/home.css';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const projects = [
+  { id: 'reliable-agents', title: 'Agentic evaluation platform', detail: 'Internal AI applications · Golden datasets, traces, and synthetic data workflows' },
+  { id: 'document-intelligence', title: 'Document intelligence', detail: '32% → 80% field-level accuracy on 100 held-out documents' },
+  { id: 'lidar-segmentation', title: 'LiDAR segmentation', detail: '92% minority-class IoU on held-out validation data' },
+];
 ---
 <Layout>
-  <div class="border-b border-stone-200 bg-stone-50/70 dark:border-stone-800 dark:bg-stone-900/30">
-    <blockquote class="mx-auto flex max-w-5xl flex-col gap-1 px-6 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
-      <p class="text-sm font-medium tracking-tight text-stone-700 sm:text-base dark:text-stone-300">
-        "We're here to put a dent in the universe."
-      </p>
-      <footer class="shrink-0 text-xs font-semibold text-stone-500">
-        <cite class="not-italic">Steve Jobs</cite>
-      </footer>
-    </blockquote>
-  </div>
+  <div class="portfolio-shell home-overview">
+    <section class="home-profile" id="about" aria-labelledby="profile-name">
+      <img class="home-portrait" src={`${base}/me.webp`} alt="Param Dave at the Golden Gate Bridge." width="400" height="480" fetchpriority="high" />
+      <h1 id="profile-name">Param Dave</h1>
+      <p class="home-role">TRC · Senior Machine Learning Engineer</p>
+      <p class="home-focus">Agentic AI · Multimodal AI<br />Robotics · Research</p>
+      <p class="home-bio">I build agentic evaluation platforms, document-intelligence pipelines, and 3D perception systems. My work connects research in AI, computer vision, and robotics to reliable applications.</p>
+      <nav class="home-contact" aria-label="Contact and profiles">
+        <a href={mailto}>Email</a>
+        <a href={github} target="_blank" rel="noopener">GitHub ↗</a>
+        <a href={linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a href={resumeUrl} target="_blank" rel="noopener">Résumé ↗</a>
+      </nav>
 
-  <section class="mx-auto max-w-5xl px-6 pt-9 pb-12 sm:pt-11">
-    <div class="grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
-      <div>
-        <p class="font-mono text-xs tracking-widest text-amber-600 uppercase dark:text-amber-400">
-          Research engineer · product builder
-        </p>
-        <h1 class="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-          I build AI systems that still work on the second Tuesday of the month.
-        </h1>
-        <p class="mt-6 max-w-2xl text-base leading-relaxed text-stone-600 dark:text-stone-400">
-          Who do you think you’re looking at? When the model breaks, I don’t call someone else, Skyler. 
-          I’m the one they call. Agentic systems, LLM post-training, 2D and 3D perception. 
-          You see a demo run once on clean data and think that’s the job? No. I’m not the one watching the demo. 
-          I’m the one who ships.
-        </p>
+      <section class="home-education" aria-labelledby="education-title">
+        <h2 id="education-title">Education</h2>
+        <div><h3>M.E. Robotics <time datetime="2023">2023</time></h3><p>University of Maryland, College Park</p></div>
+        <div><h3>B.E. Mechanical Engineering <time datetime="2020">2020</time></h3><p>Nirma University</p></div>
+      </section>
+      <blockquote class="home-quote">
+        <p>“We are a way for the cosmos to know itself.”</p>
+        <footer><cite>Carl Sagan, Cosmos</cite></footer>
+      </blockquote>
+      <section class="home-personal" aria-labelledby="beyond-work-title">
+        <h2 id="beyond-work-title">Beyond work</h2>
+        <p>I look at stars for perspective and model traces for root causes. I enjoy history, markets, geopolitics, and theology; running, hiking, lifting, football, cricket, and tennis; and unwinding with sitcoms.</p>
+      </section>
+    </section>
 
-        <p class="mt-5 max-w-2xl text-sm leading-relaxed text-stone-500 dark:text-stone-400">
-          I've always looked at the stars and wondered about our place in the universe. From
-          both physical and spiritual perspectives, I keep returning to two questions: Who am I,
-          and where do we go next as a civilization? I also love history, financial markets,
-          geopolitics, and theology. I reset by running, hiking, or lifting; play football,
-          cricket, and tennis; and unwind with sitcoms.
-        </p>
-        <p class="mt-3 max-w-2xl text-sm leading-relaxed text-stone-500 dark:text-stone-400">
-          I'm also a firm believer in e/acc and in our ability to solve difficult problems when
-          we set aside our differences and work toward becoming a Type I civilization on the
-          Kardashev scale. AI and robotics will play a major role in that journey.
-        </p>
-
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a
-            href={`${base}/projects`}
-            class="rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 dark:bg-amber-400 dark:text-stone-900 dark:hover:bg-amber-300"
-          >
-            Explore selected work →
-          </a>
-          <a
-            href={`${base}/research`}
-            class="rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-900 hover:border-stone-500 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-500"
-          >
-            Research questions
-          </a>
-        </div>
-      </div>
-
-      <figure class="flex flex-col items-center">
-        <img
-          src={`${base}/me.webp`}
-          alt="Param Dave standing in front of a fog-covered Golden Gate Bridge."
-          width="208"
-          height="208"
-          fetchpriority="high"
-          class="h-44 w-40 rotate-2 rounded-[2px] border-[10px] border-b-[38px] border-white object-cover shadow-[0_10px_30px_-12px_rgb(0_0_0/0.45)] sm:h-52 sm:w-48 md:h-60 md:w-56 dark:border-stone-200"
-        />
-        <figcaption class="relative mt-7 max-w-[17rem] self-center text-stone-500 md:-ml-4 md:self-start dark:text-stone-400">
-          <svg
-            class="hidden h-9 w-9 -rotate-12 md:absolute md:-top-6 md:-left-7 md:block"
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-          >
-            <path d="M3 21.5C4 14 8.5 8 15.5 5.2" />
-            <path d="M15.5 5.2 9.6 6.2" />
-            <path d="M15.5 5.2 14.2 11" />
-          </svg>
-          <span class="handwritten marker inline -rotate-2 text-[17px] text-stone-700 dark:text-stone-100">
-            Golden Gate Bridge. Man, was it windy. 
-            Photo: successful. Health: less so.
-          </span>
-        </figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <WorkflowDiagram />
-
-  <section class="mx-auto max-w-5xl px-6 py-9">
-    <Squiggle class="mb-10" />
-    <div class="flex items-baseline justify-between">
-      <h2 class="font-mono text-xs tracking-widest text-stone-500 uppercase">Now</h2>
-      <span class="font-mono text-[11px] text-stone-500 dark:text-stone-400">{nowLabel}</span>
-    </div>
-    <div class="mt-6 grid gap-8 md:grid-cols-[0.8fr_1.2fr] md:gap-12">
-      <div>
-        <h3 class="text-base font-semibold">Shipping</h3>
-        <p class="mt-2 text-stone-600 dark:text-stone-400">
-          Agent eval harness design across multiple projects and 3D reasoning on outdoor imagery.
-        </p>
-      </div>
-      <div>
-        <h3 class="text-base font-semibold">Investigating</h3>
-        <ul class="mt-3 space-y-3 text-stone-600 dark:text-stone-400">
-          {[
-            'How do you ground VLM and LLM reasoning through post-training, from PPO and GRPO to perception-aware objectives like PAPO?',
-            'How do you make robotics policies generalize under conditions they were not trained for?',
-            'How do you close the gap between inference benchmarks and production behavior?',
-          ].map((question) => (
-            <li class="flex gap-3">
-              <span class="mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full bg-amber-500"></span>
-              <span>{question}</span>
-            </li>
-          ))}
+    <div class="home-record">
+      <section class="home-section" aria-labelledby="news-title">
+        <header><h2 id="news-title">News</h2></header>
+        <ul class="home-news">
+          <li><time datetime={award.year}>{award.year}</time><p><a href={`${base}/research#medreason-award`}>{award.name}</a> — MedReason Challenge at MICCAI.</p></li>
+          <li><time datetime={publication.year}>{publication.year}</time><p>Our <a href={publication.url} target="_blank" rel="noopener">medical visual question answering paper</a> is available in the MICCAI MedReason proceedings.</p></li>
+          <li><time datetime={roboticsCompetition.year}>{roboticsCompetition.year}</time><p>{roboticsCompetition.placement} in <a href={`${base}/research#robofinemani`}>{roboticsCompetition.name}</a>.</p></li>
         </ul>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <section class="mx-auto max-w-5xl px-6 py-10">
-    <div class="rounded-xl bg-stone-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-10 sm:p-8 dark:bg-stone-100 dark:text-stone-900">
-      <div>
-        <p class="text-xs font-semibold text-amber-400 dark:text-amber-600">
-          My favorite kind of problem
-        </p>
-        <h2 class="mt-2 text-xl font-semibold">
-          The ones where the paper says 94% and your data says otherwise.
-        </h2>
-        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-stone-300 dark:text-stone-600">
-          I close that gap for a living — evaluation, post-training, and the model work
-          underneath it. The application layer is downstream of getting that part right.
-        </p>
-      </div>
-      <a
-        href={mailto}
-        class="mt-5 inline-block shrink-0 rounded-md bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-amber-300 sm:mt-0 dark:bg-stone-900 dark:text-white"
-      >
-        Start a conversation →
-      </a>
+      <section class="home-section" aria-labelledby="publication-title">
+        <header><h2 id="publication-title">Publication</h2><a href={`${base}/research`}>Research ↗</a></header>
+        <article class="home-publication" id="medreason-paper">
+          <div>
+            <h3><a href={publication.url} target="_blank" rel="noopener">{publication.title}</a></h3>
+            <p class="home-authors"><strong>{publication.authors[0]}</strong>, {publication.authors.slice(1).join(', ')}</p>
+            <p class="home-venue">{publication.venue}</p>
+            <div class="home-paper-links"><a href={publication.url} target="_blank" rel="noopener">Paper ↗</a><a href={publication.pdf} target="_blank" rel="noopener">PDF ↗</a></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="home-section" aria-labelledby="projects-title">
+        <header><h2 id="projects-title">Selected projects</h2><a href={`${base}/projects`}>All projects ↗</a></header>
+        <ul class="home-projects">
+          {projects.map(project => <li><h3><a href={`${base}/projects#${project.id}`}>{project.title} <span aria-hidden="true">↗</span></a></h3><p>{project.detail}</p></li>)}
+        </ul>
+      </section>
+
+      <section class="home-section" aria-labelledby="experience-title">
+        <header><h2 id="experience-title">Experience</h2><a href={`${base}/experience`}>Full experience ↗</a></header>
+        <ul class="home-experience">
+          <li><div><h3>TRC Inc</h3><p>Senior Machine Learning Engineer</p></div><span>2025–Present</span></li>
+          <li><div><h3>B Garage</h3><p>Research Intern · Depth estimation</p></div><span>2022</span></li>
+        </ul>
+      </section>
     </div>
-  </section>
+  </div>
 </Layout>

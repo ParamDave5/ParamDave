@@ -1,0 +1,5 @@
+/* Stack the wide meme caption on tablets without squeezing its image column. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .project-meme-wide { grid-template-columns: minmax(0, 1fr); }
+  .project-meme-wide > div { max-width: 420px; }
+}

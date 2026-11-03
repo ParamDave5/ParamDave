@@ -6,11 +6,11 @@ const roles = [
     company: 'TRC Inc',
     title: 'Senior Machine Learning Engineer',
     period: 'Mar 2025 – Present',
-    location: 'Remote, India',
+    location: null,
     current: true,
     bullets: [
       'Shipped an Intelligent Document Processing pipeline converting engineering PDFs to schema-constrained JSON: benchmarked open-source VLMs, paired LightOnOCR2 with a prompt-engineered LLM stage, and closed the loop with a verification database that learns from human corrections. On a held-out set of 100 handwritten, low-resolution, and complex-layout documents, field-level extraction accuracy went from 32% with the previous LLM-based pipeline to 80%, at 2.1 pages per second on an L40S with 100% schema validity.',
-      'Built the team’s LLM eval harness: automated grading, adversarial probing, and red-teaming with Promptfoo, Garak, and DeepEval, plus a custom BinEval implementation that decomposes failing runs into specific failure modes. Adapted Genie into a synthetic document Q&A generation pipeline tuned for human-like questions.',
+      'Built an agentic evaluation platform for internal AI applications using golden datasets and execution traces. Developed an agentic workflow to generate synthetic golden datasets for application-specific evaluation.',
       'Trained a custom LiDAR segmentation architecture based on RandLA-Net and KPConvNeXt on approximately 3 million labeled points spanning transmission towers and conductors. On held-out validation data, the operationally important minority class reached 92% IoU against 98% IoU on the majority class — the metric that matters on a point cloud where overall accuracy is close to the majority-class baseline. Used minority-class focused sampling, focal loss, and class-balanced re-weighting; cut training and preprocessing time through caching and batched I/O; and mentored an intern through the project.',
       'Designed LLM evaluation frameworks that turn sprint outputs, PRs, and design docs into measurable signals for team feedback loops and leadership visibility.',
       'Running production LLM inference on vLLM tuned to real traffic patterns; researching quantization, speculative decoding, and serving topologies across vLLM, SGLang, and llama.cpp.',
@@ -20,7 +20,7 @@ const roles = [
     company: 'TRC Inc',
     title: 'AI/ML Computer Vision Engineer',
     period: 'Dec 2023 – Mar 2025',
-    location: 'Remote, USA',
+    location: 'USA',
     current: false,
     bullets: [
       'Designed a robust pipeline to filter human-containing images and perform accurate object detection in utility environments. Improved detection accuracy by 15 percentage points and cut annotation time by 20% via a custom Label Studio workflow.',
@@ -55,7 +55,7 @@ const roles = [
   <section class="mx-auto max-w-3xl px-6 pt-14 pb-9">
     <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Experience</h1>
     <p class="mt-4 text-stone-600 dark:text-stone-400">
-      Where I've shipped things that ended up in front of real users.
+      Engineering and research experience across machine learning, computer vision, and production AI systems.
     </p>
   </section>
 
@@ -76,7 +76,7 @@ const roles = [
               <span class="font-mono text-xs text-stone-500">{role.period}</span>
             </div>
           </div>
-          <p class="mt-1 text-sm text-stone-500">{role.location}</p>
+          {role.location && <p class="mt-1 text-sm text-stone-500">{role.location}</p>}
           <ul class="mt-4 space-y-3 text-stone-700 dark:text-stone-300">
             {role.bullets.map((b) => (
               <li class="flex gap-3">
@@ -87,6 +87,12 @@ const roles = [
           </ul>
         </article>
       ))}
+    </div>
+  </section>
+  <section class="mx-auto max-w-3xl px-6 pb-6" aria-labelledby="toolkit-title">
+    <div class="border-t border-stone-200 pt-4 text-xs leading-relaxed text-stone-600 dark:border-stone-800 dark:text-stone-400">
+      <h2 id="toolkit-title" class="inline font-semibold text-stone-900 dark:text-stone-100">Toolkit:</h2>
+      <p class="inline">Python · C++ · SQL · PyTorch · Hugging Face · vLLM · OpenCV · COLMAP · PDAL · ROS2 · Docker · AWS</p>
     </div>
   </section>
 </Layout>

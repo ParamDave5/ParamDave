@@ -1,0 +1,22 @@
+---
+import AwardPhoto from './AwardPhoto.astro';
+import { publication } from '../data/achievements';
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<article class:list={['publication', { 'publication-compact': compact }]} id="medreason-paper">
+  <div class="publication-meta">
+    {compact ? <AwardPhoto compact /> : <><p class="eyebrow accent-text">Selected publication</p><span class="publication-year">{publication.year}</span></>}
+  </div>
+  <div class="publication-content">
+    {compact && <p class="eyebrow accent-text">Selected publication · {publication.year}</p>}
+    <p class="publication-venue">{publication.venue}</p>
+    <h2><a href={publication.url} target="_blank" rel="noopener">{publication.title} <span aria-hidden="true">↗</span></a></h2>
+    <p class="publication-authors"><strong>{publication.authors[0]}</strong>, {publication.authors.slice(1).join(', ')}</p>
+    <div class="publication-links">
+      <a class="text-link" href={publication.url} target="_blank" rel="noopener">Paper & abstract <span aria-hidden="true">↗</span></a>
+      <a class="text-link" href={publication.pdf} target="_blank" rel="noopener">Read PDF <span aria-hidden="true">↗</span></a>
+      <span>{publication.status}</span>
+    </div>
+  </div>
+</article>

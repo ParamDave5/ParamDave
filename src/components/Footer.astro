@@ -3,11 +3,11 @@ import { mailto, github, linkedin } from '../data/site';
 
 const year = new Date().getFullYear();
 ---
-<footer class="mt-24 border-t border-stone-200 dark:border-stone-800">
+<footer class="site-footer border-t border-stone-200 dark:border-stone-800">
   <div class="mx-auto grid max-w-5xl gap-4 px-6 py-8 text-sm text-stone-500 sm:grid-cols-[auto_1fr_auto] sm:items-center dark:text-stone-500">
     <p>© {year} Param Dave</p>
-    <p class="handwritten text-[16px] text-stone-600 sm:text-center dark:text-stone-400">
-      No agents were allowed to grade their own work.
+    <p class="text-xs text-stone-600 sm:text-center dark:text-stone-400">
+      Machine learning · Computer vision · Robotics
     </p>
     <div class="flex items-center gap-4">
       <a href={mailto} class="hover:text-amber-600 dark:hover:text-amber-400">Email</a>

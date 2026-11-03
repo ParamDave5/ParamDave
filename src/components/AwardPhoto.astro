@@ -1,0 +1,22 @@
+---
+import { Image } from 'astro:assets';
+import awardPhoto from '../../images/medreason-award.jpeg';
+interface Props { compact?: boolean; showCaption?: boolean; sizes?: string }
+const { compact = false, showCaption = true, sizes } = Astro.props;
+---
+<figure class:list={['award-photo', { 'award-photo-compact': compact }]}>
+  <a href={awardPhoto.src} target="_blank" rel="noopener" aria-label="View the MedReason fourth-place award photo at full size">
+    <Image
+      src={awardPhoto}
+      alt="MICCAI 2026 MedReason Challenge trophy showing fourth place and the names Param Dave, Nishad Kulkarni, and Syed Muhammad Anwar, in front of their research poster."
+      width={480}
+      widths={[240, 480, 720]}
+      sizes={sizes ?? (compact ? '(max-width: 600px) 240px, 170px' : '(max-width: 600px) calc(100vw - 94px), 340px')}
+      format="webp"
+      loading="lazy"
+      decoding="async"
+    />
+    {!showCaption && <span class="award-photo-open" aria-hidden="true">View photo ↗</span>}
+  </a>
+  {showCaption && <figcaption>MedReason Challenge · 4th place <span aria-hidden="true">↗</span></figcaption>}
+</figure>
