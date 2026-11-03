@@ -19,7 +19,7 @@
   <text x="80" y="420" font-family="ui-sans-serif, system-ui, -apple-system, Helvetica Neue, Arial, sans-serif" font-size="30" font-weight="400" fill="#a3a3a3">Research, applications, and systems that ship.</text>
 
   <line x1="80" y1="500" x2="180" y2="500" stroke="#fbbf24" stroke-width="3"/>
-  <text x="80" y="550" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#737373" letter-spacing="1">paramdave5.github.io/ParamDave</text>
+  <text x="80" y="550" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#737373" letter-spacing="1">paramdave.fyi</text>
 
   <circle cx="950" cy="315" r="195" fill="none" stroke="#262626" stroke-width="4"/>
   <circle cx="950" cy="315" r="185" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.5"/>

@@ -4,8 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://paramdave5.github.io',
-  base: '/ParamDave',
+  site: 'https://paramdave.fyi',
   trailingSlash: 'ignore',
   integrations: [sitemap()],
   vite: {

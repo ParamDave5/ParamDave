@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://paramdave5.github.io/ParamDave/sitemap-index.xml
+Sitemap: https://paramdave.fyi/sitemap-index.xml

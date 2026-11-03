@@ -2,7 +2,7 @@
 
 Personal portfolio site, built with [Astro](https://astro.build) + [Tailwind CSS](https://tailwindcss.com) v4 and deployed to GitHub Pages.
 
-Live site: https://paramdave5.github.io/ParamDave/
+Live site: https://paramdave.fyi/
 
 ## Develop
 
