@@ -24,21 +24,21 @@ const caseStudies: CaseStudy[] = [
   {
     id: 'reliable-agents',
     area: 'Agent evaluation',
-    title: 'Making agent failures diagnosable',
+    title: 'An agentic evaluation platform for internal AI applications',
     period: '2025 – Present',
     question:
-      'How do you tell whether an agent failed at perception, generation, evaluation, or verification?',
+      'How do you evaluate each internal AI application against the cases that actually matter for it?',
     context:
-      'Aggregate scores could show that an agent failed, but not which component or behavior caused the failure. The evaluation system needed to catch weaknesses before release and turn failures observed in production into specific, actionable diagnoses.',
+      'Internal AI applications each had their own tasks and failure modes, so a generic benchmark said little about whether a given application worked. Evaluation needed application-specific golden datasets and a view into how each run actually executed.',
     approach: [
-      'Built automated grading, adversarial probing, and red-teaming workflows with Promptfoo, Garak, and DeepEval.',
-      'Implemented a custom BinEval-style decomposition that separates perception, generation, evaluation, and verification failures.',
-      'Adapted Genie into a synthetic document Q&A pipeline tuned to generate questions that resemble real user intent.',
+      'Built an agentic evaluation platform that scores internal AI applications against golden datasets.',
+      'Used execution traces to see how each run behaved, not just whether its final answer passed.',
+      'Developed an agentic workflow that generates synthetic golden datasets for application-specific evaluation.',
     ],
     outcome:
-      'Built the team’s evaluation harness for pre-production quality gates and post-production diagnosis, making failed runs easier to reproduce, classify, and route toward the right system improvement.',
-    evidence: ['Pre-production quality gates', 'Post-production diagnosis', 'Failure-mode decomposition', 'Human-like synthetic Q&A'],
-    stack: ['Promptfoo', 'Garak', 'DeepEval', 'BinEval', 'Genie', 'Arize Phoenix', 'Sonar Cube'],
+      'Shipped an evaluation platform for internal AI applications, backed by golden datasets and execution traces, with synthetic golden datasets generated per application rather than written by hand.',
+    evidence: ['Golden datasets', 'Execution traces', 'Synthetic golden datasets', 'Application-specific evaluation'],
+    stack: ['Genie', 'Arize Phoenix'],
   },
   {
     id: 'document-intelligence',

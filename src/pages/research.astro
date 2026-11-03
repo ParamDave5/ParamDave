@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Publication from '../components/Publication.astro';
 import AwardPhoto from '../components/AwardPhoto.astro';
+import Meme from '../components/Meme.astro';
 import { award, roboticsCompetition } from '../data/achievements';
 ---
 <Layout
@@ -40,5 +41,38 @@ import { award, roboticsCompetition } from '../data/achievements';
       </div>
       <p><strong>{roboticsCompetition.placement}</strong></p>
     </section>
+    <section class="research-asides" aria-labelledby="research-asides-title">
+      <h2 id="research-asides-title" class="mb-4 text-base font-semibold">Between experiments</h2>
+      <div class="space-y-4">
+        <Meme
+          class="research-meme"
+          tone="dark"
+          imgWidth="390px"
+          src="ai-time-dilation.webp"
+          alt="Interstellar astronauts on an ocean planet beneath the caption: One month in AI is seven years everywhere else."
+          width={914}
+          height={514}
+        >
+          <p class="text-sm leading-relaxed">Current bottleneck: papers are being published faster than I can read them.</p>
+        </Meme>
+        <Meme
+          class="research-meme"
+          imgWidth="450px"
+          src="pooh-hallucination.webp"
+          alt="Three increasingly formal versions of Winnie the Pooh describing a model making something up, hallucinating, and performing evidentially ungrounded probabilistic synthesis."
+          width={915}
+          height={960}
+        >
+        </Meme>
+      </div>
+    </section>
   </section>
 </Layout>
+
+<style>
+  .research-asides { margin-top: 1.5rem; }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    :global(.research-meme) { grid-template-columns: minmax(0, 1fr); }
+    :global(.research-meme > div) { max-width: var(--meme-img); }
+  }
+</style>
